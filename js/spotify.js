@@ -103,12 +103,7 @@ async function spotifyCatchOAuthReturn() {
           console.error("Error:", error);
         });
 
-      // Populate local storage with tokens
-      localStorage.setItem("spotify_access_token", response.access_token);
-      // Expiry time of the access token in seconds
-      const valid_until = new Date().getTime() / 1000 + response.expires_in;
-      localStorage.setItem("spotify_valid_until", valid_until);
-      localStorage.setItem("spotify_refresh_token", response.refresh_token);
+      storeTokens(response);
     }
     resolve();
   });
@@ -121,7 +116,7 @@ async function spotifyRefreshToken() {
     client_id: spotify_clientId,
   });
 
-  const response = fetch("https://accounts.spotify.com/api/token", {
+  const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -134,16 +129,11 @@ async function spotifyRefreshToken() {
       }
       return response.json();
     })
-    .then((data) => {
-      localStorage.setItem("spotify_access_token", data.access_token);
-      // Expiry time of the access token in seconds
-      const valid_until = new Date().getTime() / 1000 + data.expires_in;
-      localStorage.setItem("spotify_valid_until", valid_until);
-      localStorage.setItem("spotify_refresh_token", data.refresh_token);
-    })
     .catch((error) => {
       console.error("Error:", error);
     });
+
+    storeTokens(response);
 }
 
 // Search Spotify for tracks and return them as JSON
@@ -169,9 +159,6 @@ async function spotifySearchTracks(query) {
       }
       return response.json();
     })
-    .then((data) => {
-      return data;
-    })
     .catch((error) => {
       console.error("Error:", error);
     });
@@ -190,6 +177,17 @@ function spotifyTokenIsExpired() {
     return false;
   }
 }
+
+// Extract tokens from a resopnse and store them in local storage
+function storeTokens(response){
+  // Populate local storage with tokens
+  localStorage.setItem("spotify_access_token", response.access_token);
+  // Expiry time of the access token in seconds
+  const valid_until = new Date().getTime() / 1000 + response.expires_in;
+  localStorage.setItem("spotify_valid_until", valid_until);
+  localStorage.setItem("spotify_refresh_token", response.refresh_token);
+}
+
 
 // TODO: Find a way to check if the refresh token is expired. Using prescence of refresh token for now
 // There is likely a way to check via API call for this
