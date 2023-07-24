@@ -1,13 +1,13 @@
 // Entry point
-document.addEventListener("DOMContentLoaded", async function () {
-  console.log("DOM loaded");
+document.addEventListener('DOMContentLoaded', async function () {
+  console.log('DOM loaded');
 
   await spotifyCatchOAuthReturn()
     .then((result) => {
       return;
     })
     .catch((error) => {
-      if (error === "access_denied") {
+      if (error === 'access_denied') {
         // User denied access
       } else {
         // Other error
@@ -26,15 +26,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     }
     // Show search bar
-    document.querySelector("#spotify-btn").setAttribute("hidden", "");
-    document.querySelector("#search-bar").removeAttribute("hidden");
+    document.querySelector('#spotify-btn').setAttribute('hidden', '');
+    document.querySelector('#search-bar').removeAttribute('hidden');
   } else {
     // App not authorized, propmt user to OAuth
-    document.querySelector("#spotify-btn").removeAttribute("hidden");
-    document.querySelector("#search-bar").setAttribute("hidden", "");
+    document.querySelector('#spotify-btn').removeAttribute('hidden');
+    document.querySelector('#search-bar').setAttribute('hidden', '');
   }
 
-  document.querySelector("#spotify-btn").addEventListener("click", function () {
+  document.querySelector('#spotify-btn').addEventListener('click', function () {
     spotifyOAuth();
   });
 });
@@ -43,12 +43,12 @@ async function listTracks(query) {
   const tracks = await spotifySearchTracks(query);
   console.log(tracks);
   for (let track of tracks.tracks.items) {
-    const trackDiv = document.createElement("div");
+    const trackDiv = document.createElement('div');
     trackDiv.textContent = track.name;
-    trackDiv.style.border = "1px solid black";
-    trackDiv.style.padding = "2px";
-    trackDiv.style.margin = "2px";
-    trackDiv.addEventListener("click", () => {
+    trackDiv.style.border = '1px solid black';
+    trackDiv.style.padding = '2px';
+    trackDiv.style.margin = '2px';
+    trackDiv.addEventListener('click', () => {
       loadUri(track.uri);
     });
     document.body.appendChild(trackDiv);
@@ -56,20 +56,18 @@ async function listTracks(query) {
 }
 
 function showMainPage() {
-  document.querySelector("#landing-page").setAttribute("hidden", "");
-  document.querySelector("#main-page").removeAttribute("hidden");
+  document.querySelector('#landing-page').setAttribute('hidden', '');
+  document.querySelector('#main-page').removeAttribute('hidden');
 }
 
 function showLandingPage() {
-  document.querySelector("#main-page").setAttribute("hidden", "");
-  document.querySelector("#landing-page").removeAttribute("hidden");
+  document.querySelector('#main-page').setAttribute('hidden', '');
+  document.querySelector('#landing-page').removeAttribute('hidden');
 }
 
 // Event listeners
-document
-  .querySelector("#search-bar")
-  .addEventListener("submit", function (event) {
+document.querySelector('#search-bar').addEventListener('submit', function (event) {
     event.preventDefault();
-    const query = document.querySelector("#search-bar input").value;
+    const query = document.querySelector('#search-bar input').value;
     listTracks(query);
   });
