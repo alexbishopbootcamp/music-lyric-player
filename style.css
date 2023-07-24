@@ -33,3 +33,17 @@ img {
     padding-top: 5px;
 
 }
+
+#spotify-player {
+    position: fixed;
+    bottom: 0px;
+}
+
+
+#player-container {
+    background-color: #282828;
+    position: fixed;
+    height: 80px;
+    width: 100%;
+    bottom: 0px;
+}
