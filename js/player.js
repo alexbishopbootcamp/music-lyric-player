@@ -56,11 +56,13 @@ function destroy(){};
 
 function ready(){
   console.log("Spotify player ready");
+  // Start playing as soon as any track is loaded
+  play();
 };
 
-// function playback_update(){
-//   console.log("Playback update");
-// }
+function playback_update(){
+  // do nothing
+}
 
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
   console.log("Spotify API ready");
@@ -73,6 +75,8 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
       uri: 'spotify:track:3z8h0TU7ReDPLIbEnYhWZb',
       height: '80',
       width: '100%',
+      // preferVideo: false, // Undocumented option I found that I don't know what does
+      theme: 'dark' // Undocumented option I found to make the player dark, #282828
     };
   let callback = (EmbedController) => {
     // https://developer.spotify.com/documentation/embeds/references/iframe-api
@@ -86,7 +90,9 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
     // Player events
     EmbedController.addListener('ready', ready);
     EmbedController.addListener('playback_update', e => playback_update(e));
-  
+    // Add back the id so we can reference it later on
+    EmbedController.iframeElement.id = 'spotify-player';
   };
   IFrameAPI.createController(player, options, callback);
+  player.id = 'spotify-player';
 };
