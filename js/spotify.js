@@ -167,6 +167,38 @@ async function spotifySearchTracks(query) {
   return response;
 }
 
+// Get information about a specific track
+async function spotifyGetTrack(trackUri) {
+  // Refresh token if needed
+  if (spotifyTokenIsExpired()) {
+    await spotifyRefreshToken();
+  }
+
+  // Get track ID from URI
+  const trackId = trackUri.split(':')[2];
+
+  const fetchUrl = `https://api.spotify.com/v1/tracks/${trackId}`;
+  const response = fetch(fetchUrl, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('spotify_access_token')}`,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('HTTP status ' + response.status);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
+    return response;
+}
+
+
+
 // Check if our locally stored access token is expired
 function spotifyTokenIsExpired() {
   const valid_until = localStorage.getItem('spotify_valid_until');
