@@ -41,7 +41,7 @@ async function spotifyOAuth(){
     let state = generateRandomString(16);
     let scope = '';
   
-    localStorage.setItem('code_verifier', codeVerifier);
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
   
     let args = new URLSearchParams({
       response_type: 'code',
@@ -58,20 +58,25 @@ async function spotifyOAuth(){
   });  
 }
 
-window.addEventListener('load', () => {
+async function spotifyCatchOAuthReturn(){
   // get code and state url params
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   const state = urlParams.get('state');
   const error = urlParams.get('error');
+
+  // Remove URL params from view
+  window.history.replaceState({}, document.title, "/");
+
   if(error){
+    // TODO: Enumerate possible errors and handle them
     alert(error);
   } else if(code && state){
     console.log(code);
     console.log(state);
     // We have just come back from Spotify auth
     // Get code verifier from local storage
-    let codeVerifier = localStorage.getItem('code_verifier');
+    let codeVerifier = localStorage.getItem('spotify_code_verifier');
     console.log(codeVerifier);
 
     const redirectUri = document.location.origin;
@@ -85,7 +90,7 @@ window.addEventListener('load', () => {
     });
 
     // Get Access Token
-    const response = fetch('https://accounts.spotify.com/api/token', {
+    const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -98,20 +103,23 @@ window.addEventListener('load', () => {
       }
       return response.json();
     })
-    .then(data => {
-      localStorage.setItem('spotify_access_token', data.access_token);
-      // Expiry time of the access token in seconds
-      const valid_until = new Date().getTime()/1000 + (data.expires_in);
-      localStorage.setItem('spotify_valid_until', valid_until);
-      localStorage.setItem('spotify_refresh_token', data.refresh_token);
-    })
     .catch(error => {
       console.error('Error:', error);
     });
 
-    window.history.replaceState({}, document.title, "/");
+    // Populate local storage with tokens
+    localStorage.setItem('spotify_access_token', response.access_token);
+    // Expiry time of the access token in seconds
+    const valid_until = new Date().getTime()/1000 + (response.expires_in);
+    localStorage.setItem('spotify_valid_until', valid_until);
+    localStorage.setItem('spotify_refresh_token', response.refresh_token);
+
+    // Return true so the app can tell if we've just come back from Spotify auth
+    return true;
+  } else {
+    return false;
   }
-});
+}
 
 async function spotifyRefreshToken(){
   console.log('Old Token')
@@ -136,6 +144,7 @@ async function spotifyRefreshToken(){
     return response.json();
   })
   .then(data => {
+    console.log(data);
     localStorage.setItem('spotify_access_token', data.access_token);
     // Expiry time of the access token in seconds
     const valid_until = new Date().getTime()/1000 + (data.expires_in);
@@ -147,6 +156,7 @@ async function spotifyRefreshToken(){
   });
 }
 
+// Search Spotify for tracks and return them as JSON
 async function spotifySearchTracks(query){
   // turn query string into URL paramater
   const urlQuery = encodeURIComponent(query);
@@ -155,7 +165,7 @@ async function spotifySearchTracks(query){
   const response = fetch(fetchUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('spotify_access_token')}`,
       }
     })
     .then(response => {
@@ -175,7 +185,8 @@ async function spotifySearchTracks(query){
     return response;
 }
 
-function spotifyCheckTokenExpired(){
+// Check if our locally stored access token is expired 
+function spotifyTokenIsExpired(){
   const valid_until = localStorage.getItem('spotify_valid_until');
   const now = new Date().getTime()/1000;
   if(now > valid_until){
@@ -185,24 +196,15 @@ function spotifyCheckTokenExpired(){
   }
 }
 
-async function listTracks(query){
-  const tracks = await spotifySearchTracks(query);
-  console.log(tracks)
-  for(let track of tracks.tracks.items){
-    const trackDiv = document.createElement('div');
-    trackDiv.textContent = track.name;
-    trackDiv.style.border = '1px solid black';
-    trackDiv.style.padding = '2px';
-    trackDiv.style.margin = '2px';
-    trackDiv.addEventListener('click', () => {
-      loadUri(track.uri);
-    });
-    document.body.appendChild(trackDiv);
-  }
+// TODO: Find a way to check if the refresh token is expired. Using prescence of refresh token for now
+// There is likely a way to check via API call for this
+function spotifyIsAuthorized(){
+  return Boolean(localStorage.getItem('spotify_refresh_token'));
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('button').addEventListener('click', () => {
-    listTracks(document.querySelector('input').value);
-  });
-});
+// Clear local storage for testing purposes
+function spotifyClearAuth(){
+  localStorage.removeItem('spotify_access_token');
+  localStorage.removeItem('spotify_valid_until');
+  localStorage.removeItem('spotify_refresh_token');
+}
