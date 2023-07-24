@@ -54,7 +54,6 @@ async function spotifyOAuth(){
     });
   
     window.location = 'https://accounts.spotify.com/authorize?' + args;
-    // console.log(redirectUri);
   });  
 }
 
@@ -72,12 +71,9 @@ async function spotifyCatchOAuthReturn(){
     // TODO: Enumerate possible errors and handle them
     alert(error);
   } else if(code && state){
-    console.log(code);
-    console.log(state);
     // We have just come back from Spotify auth
     // Get code verifier from local storage
     let codeVerifier = localStorage.getItem('spotify_code_verifier');
-    console.log(codeVerifier);
 
     const redirectUri = document.location.origin;
 
@@ -122,8 +118,6 @@ async function spotifyCatchOAuthReturn(){
 }
 
 async function spotifyRefreshToken(){
-  console.log('Old Token')
-  console.log(localStorage.getItem('spotify_access_token'));
   let body = new URLSearchParams({
     grant_type: 'refresh_token',
     refresh_token: localStorage.getItem('spotify_refresh_token'),
@@ -144,7 +138,6 @@ async function spotifyRefreshToken(){
     return response.json();
   })
   .then(data => {
-    console.log(data);
     localStorage.setItem('spotify_access_token', data.access_token);
     // Expiry time of the access token in seconds
     const valid_until = new Date().getTime()/1000 + (data.expires_in);
