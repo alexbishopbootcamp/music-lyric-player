@@ -198,7 +198,7 @@ function spotifyTokenIsExpired(){
 
 // TODO: Find a way to check if the refresh token is expired. Using prescence of refresh token for now
 // There is likely a way to check via API call for this
-function spotifyIsAuthorized(){
+async function spotifyIsAuthorized(){
   return Boolean(localStorage.getItem('spotify_refresh_token'));
 }
 

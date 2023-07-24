@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Catch if we've just returned from spotify OAuth
   await spotifyCatchOAuthReturn();
 
-
-  if(!spotifyIsAuthorized()){
+  if(!await spotifyIsAuthorized()){
     // App not authorized, propmt user to OAuth
     document.querySelector('#spotify-btn').removeAttribute('hidden');
     document.querySelector('#search-bar').setAttribute('hidden', '');
