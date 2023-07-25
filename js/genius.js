@@ -11,21 +11,21 @@ fetch('secrets.json')
 );
 secrets = 'B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
 
-var token = 'access_token=' + secrets
+var geniusToken = 'access_token=' + secrets
 
 console.log(secrets)
 //B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
 
-var toSearch = 'beat it'
+var geniusToSearch = 'beat it'
 
 
 
-const urlQuery = encodeURIComponent(toSearch);
+const urlQuery = encodeURIComponent(geniusToSearch);
 
 console.log(urlQuery)
 
 function getSongDetails() {
-  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&' + token;;
+  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&' + geniusToken;;
   
   const sondId = fetch(requestUrl, {
     method: 'GET',
@@ -39,7 +39,7 @@ function getSongDetails() {
     var title = song.full_title
     var lCaseTitle = title.toLowerCase()
     var splitlCaseTitle = lCaseTitle.split(' by')[0]
-    var lCasetoSearch = toSearch.toLowerCase()
+    var lCasetoSearch = geniusToSearch.toLowerCase()
     console.log(splitlCaseTitle);
 
     if (splitlCaseTitle === lCasetoSearch) {
@@ -60,7 +60,7 @@ function getSong(songId) {
   // fetch request gets a list of all the repos for the node.js organization
 var id = songId
 console.log(id)
-const requestUrl = 'https://api.genius.com/songs/'+ songId + '?' + token;
+const requestUrl = 'https://api.genius.com/songs/'+ songId + '?' + geniusToken;
 console.log(requestUrl)
 const lyric = fetch(requestUrl, {
     method: 'GET',
@@ -117,7 +117,7 @@ function getLyrics(requestUrl) {
     const regex = /(JSON\.parse.+)./g;
     const match = regex.exec(lyricText)[0].split(0, -1);
     const myScript = document.createElement('script');
-    myScript.innerHTML += 'document.querySelector("#text").innerHTML = (';
+    myScript.innerHTML += 'document.querySelector("#lyrics").innerHTML = (';
     myScript.innerHTML += match;
     console.log(myScript);
     document.body.appendChild(myScript);
