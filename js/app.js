@@ -26,12 +26,14 @@ document.addEventListener('DOMContentLoaded', async function () {
       });
     }
     // Show search bar
-    document.querySelector('#spotify-btn').setAttribute('hidden', '');
-    document.querySelector('#search-bar').removeAttribute('hidden');
+    // document.querySelector('#spotify-btn').setAttribute('hidden', '');
+    // document.querySelector('#search-bar').removeAttribute('hidden');
+    showLandingPage();
   } else {
     // App not authorized, propmt user to OAuth
-    document.querySelector('#spotify-btn').removeAttribute('hidden');
-    document.querySelector('#search-bar').setAttribute('hidden', '');
+    // document.querySelector('#spotify-btn').removeAttribute('hidden');
+    // document.querySelector('#search-bar').setAttribute('hidden', '');
+    showLinkingPage();
   }
 
   document.querySelector('#spotify-btn').addEventListener('click', function () {
@@ -52,7 +54,7 @@ async function listTracks(query) {
     trackDiv.addEventListener('click', () => {
       onTrackSearchResultClick(trackDiv);
     });
-    document.querySelector('#search-results').appendChild(trackDiv);
+    document.querySelector('#track-search-results').appendChild(trackDiv);
   }
 }
 
@@ -77,9 +79,9 @@ async function populateTrackInformation(trackUri){
   // Get track information
   const track = await spotifyGetTrack(trackUri);
   // Populate track information
-  document.querySelector('#album-art').src = track.album.images[0].url;
+  document.querySelector('#album-art img').src = track.album.images[0].url;
   document.querySelector('#track-title').textContent = track.name;
-  document.querySelector('#artist-name').textContent = track.artists[0].name;
+  //document.querySelector('#artist-name').textContent = track.artists[0].name;
   document.querySelector('#album-name').textContent = track.album.name;
   document.querySelector('#release-year').textContent = track.album.release_date.slice(0, 4);
   document.querySelector('#song-length').textContent = msToTime(track.duration_ms);
@@ -99,13 +101,21 @@ function msToTime(duration) {
 }
 
 function showMainPage() {
+  document.querySelector('#linking-page').setAttribute('hidden', '');
   document.querySelector('#landing-page').setAttribute('hidden', '');
   document.querySelector('#main-page').removeAttribute('hidden');
 }
 
 function showLandingPage() {
+  document.querySelector('#linking-page').setAttribute('hidden', '');
   document.querySelector('#main-page').setAttribute('hidden', '');
   document.querySelector('#landing-page').removeAttribute('hidden');
+}
+
+function showLinkingPage() {
+  document.querySelector('#main-page').setAttribute('hidden', '');
+  document.querySelector('#landing-page').setAttribute('hidden', '');
+  document.querySelector('#linking-page').removeAttribute('hidden');
 }
 
 // Event listeners
