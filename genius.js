@@ -1,17 +1,20 @@
 // Load API key from secrets.json
 var secrets = {};
 var mainText = document.getElementById('text')
-var mainText = document.getElementById('text')
 
-// fetch('secrets.json')
-//   .then(response => response.json())
-//   .then(data => {
-//     secrets = data;
-//     console.log(secrets);
-//   }
-// );
+fetch('secrets.json')
+  .then(response => response.json())
+  .then(data => {
+    secrets = data;
+    console.log(secrets);
+  }
+);
+secrets = 'B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
 
-secrets = 'access_token=B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
+var token = 'access_token=' + secrets
+
+console.log(secrets)
+//B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
 
 var toSearch = 'beat it'
 
@@ -22,7 +25,7 @@ const urlQuery = encodeURIComponent(toSearch);
 console.log(urlQuery)
 
 function getSongDetails() {
-  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&' + secrets;;
+  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&' + token;;
   
   const sondId = fetch(requestUrl, {
     method: 'GET',
@@ -57,7 +60,7 @@ function getSong(songId) {
   // fetch request gets a list of all the repos for the node.js organization
 var id = songId
 console.log(id)
-const requestUrl = 'https://api.genius.com/songs/'+ songId + '?' + secrets;
+const requestUrl = 'https://api.genius.com/songs/'+ songId + '?' + token;
 console.log(requestUrl)
 const lyric = fetch(requestUrl, {
     method: 'GET',
