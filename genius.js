@@ -13,7 +13,7 @@ var mainText = document.getElementById('text')
 
 secrets = 'access_token=B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
 
-var toSearch = 'all of me'
+var toSearch = 'beat it'
 
 
 
@@ -32,8 +32,7 @@ function getSongDetails() {
   })
   .then(data => {
     var song = data.response.hits[0].result
-    var songId = '200930'
-    //song.id.toString()
+    var songId = song.id.toString()
     var title = song.full_title
     var lCaseTitle = title.toLowerCase()
     var splitlCaseTitle = lCaseTitle.split(' by')[0]
@@ -41,7 +40,7 @@ function getSongDetails() {
     console.log(splitlCaseTitle);
 
     if (splitlCaseTitle === lCasetoSearch) {
-      getSongLyrics(songId)
+      getSong(songId)
       console.log(songId)
     } else {
       console.log("not same")
@@ -54,7 +53,7 @@ getSongDetails()
 
 
 
-function getSongLyrics(songId) {
+function getSong(songId) {
   // fetch request gets a list of all the repos for the node.js organization
 var id = songId
 console.log(id)
@@ -87,7 +86,7 @@ const lyric = fetch(requestUrl, {
       console.log(mainText)
       const requestUrl = src;
 
-      displayLyrics(requestUrl)
+      getLyrics(requestUrl)
       return song;
 
     })
@@ -99,13 +98,9 @@ const lyric = fetch(requestUrl, {
     console.log(lyric)
     return lyric;
 }
-//var gg = getApi();
-//getApi()
-
-//console.log(gg)
 
 
-function displayLyrics(requestUrl) {
+function getLyrics(requestUrl) {
   console.log(requestUrl)
   const lyric = fetch(requestUrl, {
     method: 'GET',
@@ -113,17 +108,19 @@ function displayLyrics(requestUrl) {
     .then(response => {
       return response.text();
     })
-  async function f1() {
+  async function displayLyrics() {
     const lyricText = await lyric;
-    console.log(lyricText)
+    //console.log(lyricText)
     const regex = /(JSON\.parse.+)./g;
     const match = regex.exec(lyricText)[0].split(0, -1);
     const myScript = document.createElement('script');
     myScript.innerHTML += 'document.querySelector("#text").innerHTML = (';
     myScript.innerHTML += match;
-    console.log(myScript.innerHTML);
+    console.log(myScript);
     document.body.appendChild(myScript);
+    mainText.removeChild(mainText.children[1])
+    console.log(mainText);
   }
-  f1()
+  displayLyrics()
 }
 
