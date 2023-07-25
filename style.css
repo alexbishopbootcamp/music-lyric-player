@@ -16,4 +16,32 @@ h1 {
 
 #spotify-btn {
     font-family: sans-serif;
+    /* background-color: #1DB954; */
+    font-size: 27px;
+}
+
+#spotify-btn p {
+    padding: 20px 0;
+}
+
+img {
+    width: 19%;
+    float: left;
+    padding-right: 2px;
+    padding-top: 5px;
+
+}
+
+#spotify-player {
+    position: fixed;
+    bottom: 0px;
+}
+
+
+#player-container {
+    background-color: #282828;
+    position: fixed;
+    height: 80px;
+    width: 100%;
+    bottom: 0px;
 }
