@@ -42,19 +42,20 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 async function listTracks(query) {
+  const template = document.querySelector('#search-results-template');
   const tracks = await spotifySearchTracks(query);
+  console.log(tracks);
   for (let track of tracks.tracks.items) {
-    const trackDiv = document.createElement('div');
-    trackDiv.classList.add('track-search-result');
-    trackDiv.textContent = track.name;
-    trackDiv.style.border = '1px solid black';
-    trackDiv.style.padding = '2px';
-    trackDiv.style.margin = '2px';
-    trackDiv.dataset.uri = track.uri;
-    trackDiv.addEventListener('click', () => {
+    const searchResult = template.cloneNode(true);
+    searchResult.removeAttribute('id');
+    searchResult.removeAttribute('hidden');
+    searchResult.querySelector('#template-title').textContent = track.name;
+    searchResult.querySelector('#template-artist').textContent = track.artists[0].name;
+    searchResult.querySelector('#template-art').src = track.album.images[2].url;
+    searchResult.addEventListener('click', () => {
       onTrackSearchResultClick(trackDiv);
     });
-    document.querySelector('#track-search-results').appendChild(trackDiv);
+    document.querySelector('#search-results').appendChild(searchResult);
   }
 }
 
