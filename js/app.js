@@ -49,20 +49,22 @@ async function listTracks(query) {
     const searchResult = template.cloneNode(true);
     searchResult.removeAttribute('id');
     searchResult.removeAttribute('hidden');
+    searchResult.classList.add('track-search-result');
+    searchResult.dataset.uri = track.uri;
     searchResult.querySelector('#template-title').textContent = track.name;
     searchResult.querySelector('#template-artist').textContent = track.artists[0].name;
     searchResult.querySelector('#template-art').src = track.album.images[2].url;
     searchResult.addEventListener('click', () => {
-      onTrackSearchResultClick(trackDiv);
+      onTrackSearchResultClick(searchResult);
     });
     document.querySelector('#search-results').appendChild(searchResult);
   }
 }
 
 
-function onTrackSearchResultClick(button){
+function onTrackSearchResultClick(searchResult){
   // Get track URI from button and load it
-  const trackUri = button.dataset.uri;
+  const trackUri = searchResult.dataset.uri;
   // Load track into player
   loadUri(trackUri);
   // Populate track information
