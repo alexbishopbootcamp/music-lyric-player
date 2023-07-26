@@ -1,3 +1,5 @@
+// TODO: apply hidden to genius analytics iframe as it sometimes 404s and becomes visible
+
 // Globals
 var geniusAPIKey;
 
@@ -15,28 +17,55 @@ function init(){
 
 }
 
+// High confidence filters:
+// (T1) Song name and artist name match
+// (T2) Spotify URI matches
 
-// Return a list of songs that match the search query
-function geniusSearch(query) {
+// Useful data included in the Search API response
 
-}
+// artist_names: "King Gizzard & The Lizard Wizard"
+// full_title: "Robot Stop by King Gizzard & The Lizard Wizard"
+// lyrics_state: "complete"
+// primary_artist: {name: "King Gizzard & The Lizard Wizard"}
+// release_date_components: {day: 29, month: 4, year: 2016}
+// release_date_for_display: "April 29, 2016" 
+// release_date_with_abbreviated_month_for_display: "Apr. 29, 2016"
+// stats: {hot: false, pageviews: 108390, unreviewed_annotations: 19}
+// title: "Robot Stop"
+// title_with_featured: "Robot Stop"
+
 
 // Return the lyrics for a specific track
 function geniusGetLyrics(name, artist, album, date, trackUri){
-  getSongDetails(name);
+  // getSongDetails(artist + ' ' + name);
+  matchSong(name, artist, album, date, trackUri);
 }
 
-function getSongDetails(geniusToSearch) {
+function matchSong(name, artist, album, date, trackUri){
+  // Filtering step 1: Clean title. Remove everything after the first parenthesis, hyphen, feat., etc.
+  const cleanNameRegex = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
+  const cleanName = name.replace(cleanNameRegex, '').trim();
+  const queryString = artist + ' ' + cleanName;
+  // const queryString = cleanName + ' by ' + artist;
+  console.log(queryString);
+  // Get stage 1 song list
+  const songList = geniusSearch(queryString);
+  
+}
+
+function geniusSearch(geniusToSearch) {
   const urlQuery = encodeURIComponent(geniusToSearch);
   const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&access_token=' + geniusAPIKey;
   
-  const sondId = fetch(requestUrl, {
+  const songList = fetch(requestUrl, {
     method: 'GET',
   })
   .then(response => {
     return response.json();
   })
   .then(data => {
+    //return data.response.hits;
+    console.log(data);
     var song = data.response.hits[0].result
     var songId = song.id.toString();
     getSong(songId);
@@ -53,6 +82,8 @@ function getSongDetails(geniusToSearch) {
     //   console.log("not same")
     // }
   })
+
+  return songList;
 }
 
 
