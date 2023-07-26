@@ -72,7 +72,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
     return;
   }
   let options = {
-      uri: 'spotify:track:3z8h0TU7ReDPLIbEnYhWZb',
+      uri: '',
       height: '80',
       width: '100%',
       // preferVideo: false, // Undocumented option I found that I don't know what does
