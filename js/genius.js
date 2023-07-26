@@ -6,14 +6,13 @@ fetch('secrets.json')
   .then(response => response.json())
   .then(secrets => {
     geniusAPIKey = secrets.genius;
-    init();
+    // Do any other required set up here
   }
 );
 
 // Entry point
 function init(){
-  var geniusToSearch = 'beat it';
-  getSongDetails(geniusToSearch);
+
 }
 
 
@@ -23,8 +22,8 @@ function geniusSearch(query) {
 }
 
 // Return the lyrics for a specific track
-function geniusGetLyrics(name, artist, album, year){
-
+function geniusGetLyrics(name, artist, album, date, trackUri){
+  getSongDetails(name);
 }
 
 function getSongDetails(geniusToSearch) {
@@ -39,19 +38,20 @@ function getSongDetails(geniusToSearch) {
   })
   .then(data => {
     var song = data.response.hits[0].result
-    var songId = song.id.toString()
-    var title = song.full_title
-    var lCaseTitle = title.toLowerCase()
-    var splitlCaseTitle = lCaseTitle.split(' by')[0]
-    var lCasetoSearch = geniusToSearch.toLowerCase()
-    // console.log(splitlCaseTitle);
+    var songId = song.id.toString();
+    getSong(songId);
+    // var title = song.full_title
+    // var lCaseTitle = title.toLowerCase()
+    // var splitlCaseTitle = lCaseTitle.split(' by')[0]
+    // var lCasetoSearch = geniusToSearch.toLowerCase()
+    // // console.log(splitlCaseTitle);
 
-    if (splitlCaseTitle === lCasetoSearch) {
-      getSong(songId)
-      // console.log(songId)
-    } else {
-      console.log("not same")
-    }
+    // if (splitlCaseTitle === lCasetoSearch) {
+    //   getSong(songId)
+    //   // console.log(songId)
+    // } else {
+    //   console.log("not same")
+    // }
   })
 }
 
