@@ -12,11 +12,6 @@ fetch('secrets.json')
   }
 );
 
-// Entry point
-function init(){
-
-}
-
 // High confidence filters:
 // (T1) Song name and artist name match
 // (T2) Spotify URI matches
