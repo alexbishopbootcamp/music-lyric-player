@@ -42,37 +42,44 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 async function listTracks(query) {
+  const template = document.querySelector('#search-results-template');
   const tracks = await spotifySearchTracks(query);
+  clearTrackSearchResults();
   for (let track of tracks.tracks.items) {
-    const trackDiv = document.createElement('div');
-    trackDiv.classList.add('track-search-result');
-    trackDiv.textContent = track.name;
-    trackDiv.style.border = '1px solid black';
-    trackDiv.style.padding = '2px';
-    trackDiv.style.margin = '2px';
-    trackDiv.dataset.uri = track.uri;
-    trackDiv.addEventListener('click', () => {
-      onTrackSearchResultClick(trackDiv);
+    const searchResult = template.cloneNode(true);
+    searchResult.removeAttribute('id');
+    searchResult.removeAttribute('hidden');
+    searchResult.classList.add('track-search-result');
+    searchResult.dataset.uri = track.uri;
+    searchResult.querySelector('#template-title').textContent = track.name;
+    searchResult.querySelector('#template-artist').textContent = track.artists[0].name;
+    searchResult.querySelector('#template-art').src = track.album.images[2].url;
+    searchResult.addEventListener('click', () => {
+      onTrackSearchResultClick(searchResult);
     });
-    document.querySelector('#track-search-results').appendChild(trackDiv);
+    document.querySelector('#search-results').appendChild(searchResult);
   }
 }
 
 
-function onTrackSearchResultClick(button){
+function onTrackSearchResultClick(searchResult){
   // Get track URI from button and load it
-  const trackUri = button.dataset.uri;
+  const trackUri = searchResult.dataset.uri;
   // Load track into player
   loadUri(trackUri);
   // Populate track information
   populateTrackInformation(trackUri);
   // Remove all track search results
+  clearTrackSearchResults();
+  // Switch to main page
+  showMainPage();
+}
+
+function clearTrackSearchResults(){
   const trackSearchResults = document.querySelectorAll('.track-search-result');
   for (let trackSearchResult of trackSearchResults) {
     trackSearchResult.remove();
   }
-  // Switch to main page
-  showMainPage();
 }
 
 async function populateTrackInformation(trackUri){
