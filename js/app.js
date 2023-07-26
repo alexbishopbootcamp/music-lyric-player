@@ -107,12 +107,14 @@ function showMainPage() {
 }
 
 function showLandingPage() {
+  playerRespawn();
   hideAllPages();
   document.querySelector('#landing-page').removeAttribute('hidden');
   scrollToTop();
 }
 
 function showLinkingPage() {
+  playerRespawn();
   hideAllPages();
   document.querySelector('#linking-page').removeAttribute('hidden');
   scrollToTop();
@@ -139,6 +141,5 @@ document.querySelector('#search-bar').addEventListener('submit', function (event
   });
 
   document.querySelector('#title-link').addEventListener('click', () => {
-    playerClear();
     showLandingPage();
   })
