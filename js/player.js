@@ -6,12 +6,12 @@ script.async = true;
 document.body.appendChild(script);
 
 // Exports
-function loadTrack(){};
-function loadUri(){};
-function play(){};
-function togglePlay(){};
-function seek(){};
-function destroy(){};
+function playerLoadTrack(){};
+function playerLoadURI(){};
+function playerPlay(){};
+function playerTogglePlay(){};
+function playerSeek(){};
+function playerDestroy(){};
 
 // Generate some buttons to demo the player API
 // const playButton = document.createElement('button');
@@ -57,7 +57,7 @@ function destroy(){};
 function ready(){
   console.log("Spotify player ready");
   // Start playing as soon as any track is loaded
-  play();
+  playerPlay();
 };
 
 function playback_update(){
@@ -81,11 +81,11 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
   let callback = (EmbedController) => {
     // https://developer.spotify.com/documentation/embeds/references/iframe-api
     // Player methods
-    loadUri = (uri)   => EmbedController.loadUri(uri);
-    play = ()         => EmbedController.play();
-    togglePlay = ()   => EmbedController.togglePlay();
-    seek = (seconds)  => EmbedController.seek(seconds);
-    destroy = ()      => EmbedController.destroy();
+    playerLoadURI = (uri)   => EmbedController.loadUri(uri);
+    playerPlay = ()         => EmbedController.play();
+    playerTogglePlay = ()   => EmbedController.togglePlay();
+    playerSeek = (seconds)  => EmbedController.seek(seconds);
+    playerDestroy = ()      => EmbedController.destroy();
 
     // Player events
     EmbedController.addListener('ready', ready);
