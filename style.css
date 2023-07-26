@@ -51,3 +51,7 @@ img {
     margin-top: 5px;
     border-image: linear-gradient(to right, #ec4899, #f97316) 1;
 }
+
+[hidden] {
+    display: none !important;
+}
