@@ -13,47 +13,6 @@ function playerTogglePlay(){};
 function playerSeek(){};
 function playerDestroy(){};
 
-// Generate some buttons to demo the player API
-// const playButton = document.createElement('button');
-// playButton.innerHTML = "Play";
-// playButton.onclick = () => play();
-// document.body.appendChild(playButton);
-
-// const togglePlayButton = document.createElement('button');
-// togglePlayButton.innerHTML = "Toggle Play";
-// togglePlayButton.onclick = () => togglePlay();
-// document.body.appendChild(togglePlayButton);
-
-// const destroyButton = document.createElement('button');
-// destroyButton.innerHTML = "Destroy";
-// destroyButton.onclick = () => destroy();
-// document.body.appendChild(destroyButton);
-
-// const seekButton = document.createElement('button');
-// seekButton.innerHTML = "Seek to 30s";
-// seekButton.onclick = () => seek(30);
-// document.body.appendChild(seekButton);
-
-// const trackSelector = document.createElement('p');
-// trackSelector.innerHTML = "Select a track to load";
-// document.body.appendChild(trackSelector);
-
-// const BohemianRhapsody = document.createElement('button');
-// BohemianRhapsody.innerHTML = "Bohemian Rhapsody";
-// BohemianRhapsody.onclick = () => loadUri('spotify:track:3z8h0TU7ReDPLIbEnYhWZb');
-// document.body.appendChild(BohemianRhapsody);
-
-// const UnderTheBridge = document.createElement('button');
-// UnderTheBridge.innerHTML = "Under the Bridge";
-// UnderTheBridge.onclick = () => loadUri('spotify:track:3d9DChrdc6BOeFsbrZ3Is0');
-// document.body.appendChild(UnderTheBridge);
-
-// const OneStepCloser = document.createElement('button');
-// OneStepCloser.innerHTML = "One Step Closer";
-// OneStepCloser.onclick = () => loadUri('spotify:track:3K4HG9evC7dg3N0R9cYqk4');
-// document.body.appendChild(OneStepCloser);
- 
-
 function ready(){
   console.log("Spotify player ready");
   // Start playing as soon as any track is loaded
