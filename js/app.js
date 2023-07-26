@@ -137,3 +137,8 @@ document.querySelector('#search-bar').addEventListener('submit', function (event
     const query = document.querySelector('#search-bar input').value;
     searchTracks(query);
   });
+
+  document.querySelector('#title-link').addEventListener('click', () => {
+    playerClear();
+    showLandingPage();
+  })
