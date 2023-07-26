@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 async function listTracks(query) {
   const template = document.querySelector('#search-results-template');
   const tracks = await spotifySearchTracks(query);
-  console.log(tracks);
+  clearTrackSearchResults();
   for (let track of tracks.tracks.items) {
     const searchResult = template.cloneNode(true);
     searchResult.removeAttribute('id');
@@ -70,12 +70,16 @@ function onTrackSearchResultClick(searchResult){
   // Populate track information
   populateTrackInformation(trackUri);
   // Remove all track search results
+  clearTrackSearchResults();
+  // Switch to main page
+  showMainPage();
+}
+
+function clearTrackSearchResults(){
   const trackSearchResults = document.querySelectorAll('.track-search-result');
   for (let trackSearchResult of trackSearchResults) {
     trackSearchResult.remove();
   }
-  // Switch to main page
-  showMainPage();
 }
 
 async function populateTrackInformation(trackUri){
