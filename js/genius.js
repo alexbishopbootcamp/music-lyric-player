@@ -36,16 +36,38 @@ function geniusGetLyrics(name, artist, album, date, trackUri){
   matchSong(name, artist, album, date, trackUri);
 }
 
-function matchSong(name, artist, album, date, trackUri){
+async function matchSong(name, artist, album, date, trackUri){
   // Filtering step 1: Clean title. Remove everything after the first parenthesis, hyphen, feat., etc.
   const cleanNameRegex = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
   const cleanName = name.replace(cleanNameRegex, '').trim();
-  const queryString = artist + ' ' + cleanName;
-  // const queryString = cleanName + ' by ' + artist;
+  // const queryString = artist + ' ' + cleanName;
+  const queryString = cleanName;
   console.log(queryString);
   // Get stage 1 song list
-  const songList = geniusSearch(queryString);
+  const songList = await geniusSearch(queryString);
+  console.log(tier1Match(songList, name, artist));
   
+}
+
+// Attempt to match using only data from the initial search
+function tier1Match(songList, name, artist){
+  let match;
+  for(let song of songList){
+    // Title AND artist match
+    if(song.title.toLowerCase() === name.toLowerCase() && song.primary_artist.name.toLowerCase() === artist.toLowerCase()){
+      return song;
+    } 
+    // Title matches and is only title match in songList
+    else if(song.title.toLowerCase() === name.toLowerCase()){
+      if(match){
+        // If there is more than one match, return false
+        return false;
+      } else {
+        match = song;
+      }
+    }
+  }
+  return match;
 }
 
 function geniusSearch(geniusToSearch) {
@@ -59,7 +81,9 @@ function geniusSearch(geniusToSearch) {
     return response.json();
   })
   .then(data => {
-    //return data.response.hits;
+    // return map of data.response.hits[x].result
+    return data.response.hits.map(hit => hit.result);
+    
     console.log(data);
     var song = data.response.hits[0].result
     var songId = song.id.toString();
