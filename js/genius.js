@@ -1,31 +1,35 @@
-// Load API key from secrets.json
-var secrets = {};
-var mainText = document.getElementById('text')
+// Globals
+var geniusAPIKey;
 
+// Load API key first
 fetch('secrets.json')
   .then(response => response.json())
-  .then(data => {
-    secrets = data;
-    console.log(secrets);
+  .then(secrets => {
+    geniusAPIKey = secrets.genius;
+    init();
   }
 );
-secrets = 'B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
 
-var geniusToken = 'access_token=' + secrets
-
-console.log(secrets)
-//B98dceKwMBqBfHmExWu8E3xQ4SB-m8b4OGKlxj4Xc4elRZ6oQUhE-HfjpXpDMxLp'
-
-var geniusToSearch = 'beat it'
+// Entry point
+function init(){
+  var geniusToSearch = 'beat it';
+  getSongDetails(geniusToSearch);
+}
 
 
+// Return a list of songs that match the search query
+function geniusSearch(query) {
 
-const urlQuery = encodeURIComponent(geniusToSearch);
+}
 
-console.log(urlQuery)
+// Return the lyrics for a specific track
+function geniusGetLyrics(name, artist, album, year){
 
-function getSongDetails() {
-  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&' + geniusToken;;
+}
+
+function getSongDetails(geniusToSearch) {
+  const urlQuery = encodeURIComponent(geniusToSearch);
+  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&access_token=' + geniusAPIKey;
   
   const sondId = fetch(requestUrl, {
     method: 'GET',
@@ -40,71 +44,49 @@ function getSongDetails() {
     var lCaseTitle = title.toLowerCase()
     var splitlCaseTitle = lCaseTitle.split(' by')[0]
     var lCasetoSearch = geniusToSearch.toLowerCase()
-    console.log(splitlCaseTitle);
+    // console.log(splitlCaseTitle);
 
     if (splitlCaseTitle === lCasetoSearch) {
       getSong(songId)
-      console.log(songId)
+      // console.log(songId)
     } else {
       console.log("not same")
     }
   })
 }
-getSongDetails()
-
-
-
 
 
 function getSong(songId) {
-  // fetch request gets a list of all the repos for the node.js organization
-var id = songId
-console.log(id)
-const requestUrl = 'https://api.genius.com/songs/'+ songId + '?' + geniusToken;
-console.log(requestUrl)
-const lyric = fetch(requestUrl, {
+  // console.log(id)
+  const requestUrl = 'https://api.genius.com/songs/'+ songId + '?access_token=' + geniusAPIKey;
+  // console.log(requestUrl)
+  const lyric = fetch(requestUrl, {
     method: 'GET',
     })
     .then(response => {
-      console.log(secrets)
-      console.log(response)
       return response.json();
     })
 
     .then(data => {
-      console.log(data)
-
+      // console.log(data);
       var song = data.response.song.embed_content;
-
       let parser = new DOMParser();
       let doc = parser.parseFromString(song, "text/html");
-
       let scriptTag = doc.body.childNodes[2];
-      console.log(scriptTag.src);
-
       var src = scriptTag.src
-
-      console.log(mainText)
-
-      console.log(mainText)
       const requestUrl = src;
-
       getLyrics(requestUrl)
       return song;
-
     })
     .catch(error => {
         console.error('Error:', error);
     });
 
-    // return data from response
-    console.log(lyric)
     return lyric;
 }
 
 
 function getLyrics(requestUrl) {
-  console.log(requestUrl)
   const lyric = fetch(requestUrl, {
     method: 'GET',
     })
@@ -113,16 +95,13 @@ function getLyrics(requestUrl) {
     })
   async function displayLyrics() {
     const lyricText = await lyric;
-    //console.log(lyricText)
     const regex = /(JSON\.parse.+)./g;
     const match = regex.exec(lyricText)[0].split(0, -1);
     const myScript = document.createElement('script');
     myScript.innerHTML += 'document.querySelector("#lyrics").innerHTML = (';
     myScript.innerHTML += match;
-    console.log(myScript);
     document.body.appendChild(myScript);
-    mainText.removeChild(mainText.children[1])
-    console.log(mainText);
+    // mainText.removeChild(mainText.children[1])
   }
   displayLyrics()
 }

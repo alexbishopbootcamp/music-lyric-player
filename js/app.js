@@ -25,14 +25,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Enable button code here
       });
     }
-    // Show search bar
-    // document.querySelector('#spotify-btn').setAttribute('hidden', '');
-    // document.querySelector('#search-bar').removeAttribute('hidden');
     showLandingPage();
   } else {
-    // App not authorized, propmt user to OAuth
-    // document.querySelector('#spotify-btn').removeAttribute('hidden');
-    // document.querySelector('#search-bar').setAttribute('hidden', '');
     showLinkingPage();
   }
 
@@ -41,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
 });
 
-async function listTracks(query) {
+async function searchTracks(query) {
   const template = document.querySelector('#search-results-template');
   const tracks = await spotifySearchTracks(query);
   clearTrackSearchResults();
@@ -60,7 +54,6 @@ async function listTracks(query) {
     document.querySelector('#search-results').appendChild(searchResult);
   }
 }
-
 
 function onTrackSearchResultClick(searchResult){
   // Get track URI from button and load it
@@ -108,26 +101,44 @@ function msToTime(duration) {
 }
 
 function showMainPage() {
-  document.querySelector('#linking-page').setAttribute('hidden', '');
-  document.querySelector('#landing-page').setAttribute('hidden', '');
+  hideAllPages();
   document.querySelector('#main-page').removeAttribute('hidden');
+  scrollToTop();
 }
 
 function showLandingPage() {
-  document.querySelector('#linking-page').setAttribute('hidden', '');
-  document.querySelector('#main-page').setAttribute('hidden', '');
+  hideAllPages();
   document.querySelector('#landing-page').removeAttribute('hidden');
+  scrollToTop();
 }
 
 function showLinkingPage() {
+  hideAllPages();
+  document.querySelector('#linking-page').removeAttribute('hidden');
+  scrollToTop();
+}
+
+function hideAllPages(){
   document.querySelector('#main-page').setAttribute('hidden', '');
   document.querySelector('#landing-page').setAttribute('hidden', '');
-  document.querySelector('#linking-page').removeAttribute('hidden');
+  document.querySelector('#linking-page').setAttribute('hidden', '');
+}
+
+function scrollToTop(){
+  // wait for page to redraw then scroll to top
+  window.requestAnimationFrame(() => {
+    window.scrollTo(0, 0);
+  });
 }
 
 // Event listeners
 document.querySelector('#search-bar').addEventListener('submit', function (event) {
     event.preventDefault();
     const query = document.querySelector('#search-bar input').value;
-    listTracks(query);
+    searchTracks(query);
   });
+
+  document.querySelector('#title-link').addEventListener('click', () => {
+    showLandingPage();
+    playerRespawn();
+  })
