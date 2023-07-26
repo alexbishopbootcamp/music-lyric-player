@@ -36,7 +36,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 async function searchTracks(query) {
+  // Clear lyrics in case user has looped back around without reloading page
+  clearLyrics();
   const template = document.querySelector('#search-results-template');
+  // Inject loading spinner
+  showLoadingSpinnerTrackSearch();
   const tracks = await spotifySearchTracks(query);
   clearTrackSearchResults();
   for (let track of tracks.tracks.items) {
@@ -44,6 +48,10 @@ async function searchTracks(query) {
     searchResult.removeAttribute('id');
     searchResult.removeAttribute('hidden');
     searchResult.classList.add('track-search-result');
+    searchResult.dataset.name = track.name;
+    searchResult.dataset.artist = track.artists[0].name;
+    searchResult.dataset.album = track.album.name;
+    searchResult.dataset.date = track.album.release_date;
     searchResult.dataset.uri = track.uri;
     searchResult.querySelector('#template-title').textContent = track.name;
     searchResult.querySelector('#template-artist').textContent = track.artists[0].name;
@@ -56,8 +64,16 @@ async function searchTracks(query) {
 }
 
 function onTrackSearchResultClick(searchResult){
-  // Get track URI from button and load it
+  // Extract track information from dataset
+  const name = searchResult.dataset.name;
+  const artist = searchResult.dataset.artist;
+  const album = searchResult.dataset.album;
+  const date = searchResult.dataset.date;
   const trackUri = searchResult.dataset.uri;
+  // Show the spinner
+  showLoadingSpinnerLyrics();
+  // Fetch lyrics from Genius, providing all the info it may need to find a match
+  geniusGetLyrics(name, artist, album, date, trackUri);
   // Load track into player
   playerLoadURI(trackUri);
   // Populate track information
@@ -68,11 +84,26 @@ function onTrackSearchResultClick(searchResult){
   showMainPage();
 }
 
+function showLoadingSpinnerLyrics(){
+  const spinner = document.querySelector('#spinner').cloneNode(true);
+  spinner.removeAttribute('id');
+  spinner.removeAttribute('hidden');
+  document.querySelector('#lyrics').appendChild(spinner);
+}
+
+function showLoadingSpinnerTrackSearch(){
+  const spinner = document.querySelector('#spinner').cloneNode(true);
+  spinner.removeAttribute('id');
+  spinner.removeAttribute('hidden');
+  document.querySelector('#search-results').appendChild(spinner);
+}
+
 function clearTrackSearchResults(){
-  const trackSearchResults = document.querySelectorAll('.track-search-result');
-  for (let trackSearchResult of trackSearchResults) {
-    trackSearchResult.remove();
-  }
+  document.querySelector('#search-results').innerHTML = '';
+}
+
+function clearLyrics(){
+  document.querySelector('#lyrics').innerHTML = '';
 }
 
 async function populateTrackInformation(trackUri){
