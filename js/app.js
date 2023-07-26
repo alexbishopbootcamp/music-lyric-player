@@ -66,7 +66,7 @@ function onTrackSearchResultClick(searchResult){
   // Get track URI from button and load it
   const trackUri = searchResult.dataset.uri;
   // Load track into player
-  loadUri(trackUri);
+  playerLoadURI(trackUri);
   // Populate track information
   populateTrackInformation(trackUri);
   // Remove all track search results
