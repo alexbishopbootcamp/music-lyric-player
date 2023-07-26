@@ -46,7 +46,7 @@ img {
     bottom: 0px;
 }
 
-#search-results-template {
+.template-styling {
     margin: auto;
     margin-top: 5px;
     border-image: linear-gradient(to right, #ec4899, #f97316) 1;
