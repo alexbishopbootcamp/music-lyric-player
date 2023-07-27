@@ -52,11 +52,17 @@ img {
     border-image: linear-gradient(to right, #ec4899, #f97316) 1;
 }
 
+.track-info {
+    margin-left: 20px;
+}
+
 [hidden] {
     display: none !important;
 }
 
-
+.lyric-box {
+    margin-bottom: 128px;
+}
 
 /* Loader taken and modified from https://cssloaders.github.io */
 .loader {
