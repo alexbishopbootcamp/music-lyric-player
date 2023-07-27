@@ -38,12 +38,12 @@ fetch('secrets.json')
 
 
 // Return the lyrics for a specific track
-function geniusGetLyrics(name, artist, album, date, trackUri){
+function geniusGetLyrics(name, artist, ){
   // getSongDetails(artist + ' ' + name);
-  matchSong(name, artist, album, date, trackUri);
+  matchSong(name, artist);
 }
 
-async function matchSong(name, artist, album, date, trackUri){
+async function matchSong(name, artist){
   // Always .toLowerCase() before comparing strings
   name = name.toLowerCase();
   artist = artist.toLowerCase();
@@ -63,7 +63,7 @@ async function matchSong(name, artist, album, date, trackUri){
 
   // TODO: Implement MAXFALLBACKS
 
-  // pre-fetch all fallback searches
+  // Pre-fetch all fallback searches
   const songList1 = geniusSearch(queryString1);
   const songList2 = geniusSearch(queryString2);
   const songList3 = geniusSearch(queryString3);
@@ -81,14 +81,36 @@ async function matchSong(name, artist, album, date, trackUri){
     }
   }
 
+  // Select #lyrics div to display error msg if not fund
   document.querySelector("#lyrics").innerHTML = "No lyrics found";
-  
 }
+
+// Function to return list of song from search
+function geniusSearch(geniusToSearch) {
+  const urlQuery = encodeURIComponent(geniusToSearch);
+  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&access_token=' + geniusAPIKey;
+  
+  const songList = fetch(requestUrl, {
+    method: 'GET',
+  })
+  .then(response => {
+    return response.json();
+  })
+  .then(data => {
+    // return map of data.response.hits[x].result
+    return data.response.hits.map(hit => hit.result);
+  })
+
+  //console.log(songList)
+  return songList;
+}
+
 
 // Attempt to match using only data from the initial search
 function tier1Match(songList, spotifyTitle, spotifyArtist){
   let matches = [];
   // console.log(songList);
+
   for(let geniusSong of songList){
     // Clean up strings
     const geniusTitle = geniusSong.title.toLowerCase();
@@ -104,7 +126,6 @@ function tier1Match(songList, spotifyTitle, spotifyArtist){
 
     // Match Unique Title (inside loop)
     else if(geniusTitle === spotifyTitle || geniusTitleClean === spotifyTitle){
-      
       matches.push(geniusSong);
     }
   }
@@ -128,88 +149,90 @@ function tier2Match(songList, spotifyTitle, spotifyArtist){
   return songList[0];
 }
 
-function geniusSearch(geniusToSearch) {
-  const urlQuery = encodeURIComponent(geniusToSearch);
-  const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&access_token=' + geniusAPIKey;
-  
-  const songList = fetch(requestUrl, {
-    method: 'GET',
-  })
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
-    // return map of data.response.hits[x].result
-    return data.response.hits.map(hit => hit.result);
-    
-    console.log(data);
-    var song = data.response.hits[0].result
-    var songId = song.id.toString();
-    getSong(songId);
-    // var title = song.full_title
-    // var lCaseTitle = title.toLowerCase()
-    // var splitlCaseTitle = lCaseTitle.split(' by')[0]
-    // var lCasetoSearch = geniusToSearch.toLowerCase()
-    // // console.log(splitlCaseTitle);
 
-    // if (splitlCaseTitle === lCasetoSearch) {
-    //   getSong(songId)
-    //   // console.log(songId)
-    // } else {
-    //   console.log("not same")
-    // }
-  })
-
-  return songList;
-}
-
-
+// Function to access song with Id
 function getSong(songId) {
-  // console.log(id)
+  // Fetch request of the song using Id requires token
   const requestUrl = 'https://api.genius.com/songs/'+ songId + '?access_token=' + geniusAPIKey;
-  // console.log(requestUrl)
-  const lyric = fetch(requestUrl, {
+  console.log(requestUrl)
+
+  // Store found lyrics content of song from Url
+  fetch(requestUrl, {
     method: 'GET',
     })
+    // Return the response and covert to JSON
     .then(response => {
+      //console.log(response)
       return response.json();
     })
 
+    // Function to access embedded song content from response.json
     .then(data => {
-      // console.log(data);
-      var song = data.response.song.embed_content;
+      console.log(data)
+
+      // Store embedded content
+      var songEmbed = data.response.song.embed_content;
+
+      // Create DOMParser
       let parser = new DOMParser();
-      let doc = parser.parseFromString(song, "text/html");
+      // Parse embedded content in html format and store in var doc 
+      let doc = parser.parseFromString(songEmbed, "text/html");
+      // Select scriptTag from embedded content
       let scriptTag = doc.body.childNodes[2];
+      // Displayed lyric in html format
+      console.log(scriptTag.src)
+      // Select src form scripTag 
       var src = scriptTag.src
-      const requestUrl = src;
+
+      // Pass src as Url to getLyric function
+      const requestUrl = src
       getLyrics(requestUrl)
-      return song;
+
+      // Return html format of song embedded content 
+      var htmlSongEmbed = doc.body
+      //console.log(htmlSongEmbed);
+      return htmlSongEmbed;
     })
+    
+    // For error checking 
     .catch(error => {
         console.error('Error:', error);
     });
-
-    return lyric;
 }
 
 
+// Fetch request gets the song embed.js lyric, using song src
 function getLyrics(requestUrl) {
+
+  // Fetch function to extract lyrics from song src.embed.js 
   const lyric = fetch(requestUrl, {
     method: 'GET',
     })
+    // Return the response and covert to text
     .then(response => {
       return response.text();
     })
+  
+  // Function too display Lyrics
   async function displayLyrics() {
+    // Lyric text
     const lyricText = await lyric;
+
+    // Get only text after "JSON\.parse" and ")"
     const regex = /(JSON\.parse.+)./g;
-    const match = regex.exec(lyricText)[0].split(0, -1);
+    // Store new cut lyric text in lyricOnly
+    const lyricOnly = regex.exec(lyricText)[0].split(0, -1);
+    // Create new <script>
     const myScript = document.createElement('script');
+    // Add lyrics to script
     myScript.innerHTML += 'document.querySelector("#lyrics").innerHTML = (';
-    myScript.innerHTML += match;
+    myScript.innerHTML += lyricOnly;
+    //console.log(myScript);
+    // Create and display in index.html
     document.body.appendChild(myScript);
+    // Then remove the <inframe> element
     // mainText.removeChild(mainText.children[1])
+    //console.log(mainText);
   }
   displayLyrics()
 }
