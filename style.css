@@ -110,6 +110,32 @@ img {
     }
   }
   
+  @media screen and (max-width: 1366px){ 
+    .artist-banner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .track-info {
+        margin-left: 0;
+    }
+    #album-art {
+        max-height: 150px;
+        min-height: 150px;
+        max-width: 150px;
+        min-width: 150px;
+    }
+    #track-title {
+        font-size: 1.75rem;
+    }
+  }
+
+  @media screen and (max-width: 510px){
+    #lyrics {
+        font-size: 12px;
+    }
+  }
+
   @keyframes animloader1 {
     0% {
       height: 48px;
