@@ -1,7 +1,8 @@
 // TODO: apply hidden to genius analytics iframe as it sometimes 404s and becomes visible
 
-// Globals
+// Globals and constants
 var geniusAPIKey;
+const cleanNameRegex = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
 
 // Load API key first
 fetch('secrets.json')
@@ -30,6 +31,10 @@ fetch('secrets.json')
 // title_with_featured: "Robot Stop"
 
 
+// Matching order:
+// Tier 1 High, Tier 1 Low, Tier 2
+
+
 // Return the lyrics for a specific track
 function geniusGetLyrics(name, artist, album, date, trackUri){
   // getSongDetails(artist + ' ' + name);
@@ -38,37 +43,51 @@ function geniusGetLyrics(name, artist, album, date, trackUri){
 
 async function matchSong(name, artist, album, date, trackUri){
   // Filtering step 1: Clean title. Remove everything after the first parenthesis, hyphen, feat., etc.
-  const cleanNameRegex = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
   const cleanName = name.replace(cleanNameRegex, '').trim();
   // const queryString = artist + ' ' + cleanName;
   const queryString = cleanName;
+  // const queryString = artist + ' ' + name;
+  // const queryString = name;
   console.log(queryString);
   // Get stage 1 song list
   const songList = await geniusSearch(queryString);
-  console.log(tier1Match(songList, name, artist));
+  const matchedLyrics = tier1Match(songList, queryString, artist);
+  if(matchedLyrics){
+    getSong(matchedLyrics.id.toString());
+  } else {
+    document.querySelector("#lyrics").innerHTML = "No lyrics found";
+  }
   
 }
 
 // Attempt to match using only data from the initial search
-function tier1Match(songList, name, artist){
+function tier1Match(songList, spotifyName, artist){
   let match;
-  for(let song of songList){
+  console.log(songList);
+  for(let geniusSong of songList){
+    console.log('Genius: ' + geniusSong.title.toLowerCase() + ', Spotify: ' + spotifyName.toLowerCase());
+    // Also clean title from Genius for comparison
+    geniusSong.title = geniusSong.title.replace(cleanNameRegex, '').trim();
+    console.log('Genius (clean): ' + geniusSong.title.toLowerCase() + ', Spotify: ' + spotifyName.toLowerCase());
     // Title AND artist match
-    if(song.title.toLowerCase() === name.toLowerCase() && song.primary_artist.name.toLowerCase() === artist.toLowerCase()){
-      return song;
+    if(geniusSong.title.toLowerCase() === spotifyName.toLowerCase() && geniusSong.primary_artist.name.toLowerCase() === artist.toLowerCase()){
+      return geniusSong;
     } 
     // Title matches and is only title match in songList
-    else if(song.title.toLowerCase() === name.toLowerCase()){
+    else if(geniusSong.title.toLowerCase() === spotifyName.toLowerCase()){
       if(match){
         // If there is more than one match, return false
+        console.log('Multiple matches found, dropping');
         return false;
       } else {
-        match = song;
+        match = geniusSong;
       }
     }
   }
   return match;
 }
+
+function tier2Match(){}
 
 function geniusSearch(geniusToSearch) {
   const urlQuery = encodeURIComponent(geniusToSearch);
