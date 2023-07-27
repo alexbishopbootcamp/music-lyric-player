@@ -14,6 +14,16 @@ h1 {
     font-family: "caprasimo";
 }
 
+#spotify-btn {
+  font-family: sans-serif;
+  /* background-color: #1DB954; */
+  font-size: 27px;
+}
+
+#spotify-btn p {
+  padding: 20px 0;
+}
+
 img {
     width: 19%;
     float: left;
