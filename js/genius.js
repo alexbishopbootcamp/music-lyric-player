@@ -5,7 +5,7 @@ var geniusAPIKey;
 const CLEANREGEX = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
 const TIER2 = true;
 const MAXFALLBACKS = 4;
-const DEBUG = false;
+const DEBUG = true;
 
 // Load API key first
 fetch('secrets.json')
@@ -70,13 +70,24 @@ async function matchSong(name, artist, album, date, trackUri){
 
   // TODO: Manual search fallback
   document.querySelector("#lyrics").innerHTML = "Could not match lyrics. Please select from the list";
-  const searchResult = document.querySelector('#search-results-template').cloneNode(true);
-  searchResult.removeAttribute('id');
-  searchResult.removeAttribute('hidden');
-  searchResult.querySelector('#template-title').innerHTML = 'Song Title';
-  searchResult.querySelector('#template-artist').innerHTML = 'Song Artist';
-  searchResult.querySelector('#template-art').src = 'Image SRC here';
-  searchResult.querySelector("#lyrics").innerHTML.appendChild(searchResult);
+
+  // Use song list from cleaned name search
+  for(let geniusSong of songListList[1]){
+    debugLog(geniusSong);
+    const searchResult = document.querySelector('#search-results-template').cloneNode(true);
+    searchResult.removeAttribute('id');
+    searchResult.removeAttribute('hidden');
+    searchResult.querySelector('#template-title').innerHTML = geniusSong.title;
+    searchResult.querySelector('#template-artist').innerHTML = geniusSong.primary_artist.name;
+    searchResult.querySelector('#template-art').src = geniusSong.song_art_image_thumbnail_url;
+    searchResult.addEventListener('click', function(){
+      // clear lyrics field
+      document.querySelector("#lyrics").innerHTML = "";
+      showLoadingSpinnerLyrics();
+      getSong(geniusSong.id.toString());
+    });
+    document.querySelector("#lyrics").appendChild(searchResult);
+  }
 }
 
 // Attempt to match using only data from the initial search
