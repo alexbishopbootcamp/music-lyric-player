@@ -195,10 +195,19 @@ function getLyrics(requestUrl) {
     const match = regex.exec(lyricText)[0].split(0, -1);
     const myScript = document.createElement('script');
     myScript.innerHTML += 'document.querySelector("#lyrics").innerHTML = (';
-    myScript.innerHTML += match;
+    myScript.innerHTML += match + ';lyricsInjected();';
+
+
     document.body.appendChild(myScript);
     // mainText.removeChild(mainText.children[1])
   }
   displayLyrics()
 }
 
+function lyricsInjected(){
+  debugLog('Script Injected');
+  // Cleanup left over elements from injection
+  document.querySelector('.rg_embed_header').remove();
+  document.querySelector('.rg_embed_footer').remove();
+  document.querySelector('.rg_embed_analytics').remove();
+}
