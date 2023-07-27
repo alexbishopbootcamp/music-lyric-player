@@ -25,14 +25,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Enable button code here
       });
     }
-    // Show search bar
-    // document.querySelector('#spotify-btn').setAttribute('hidden', '');
-    // document.querySelector('#search-bar').removeAttribute('hidden');
     showLandingPage();
   } else {
-    // App not authorized, propmt user to OAuth
-    // document.querySelector('#spotify-btn').removeAttribute('hidden');
-    // document.querySelector('#search-bar').setAttribute('hidden', '');
     showLinkingPage();
   }
 
@@ -41,8 +35,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
 });
 
-async function listTracks(query) {
+async function searchTracks(query) {
+  // Clear lyrics in case user has looped back around without reloading page
+  clearLyrics();
   const template = document.querySelector('#search-results-template');
+  // Inject loading spinner
+  showLoadingSpinnerTrackSearch();
   const tracks = await spotifySearchTracks(query);
   clearTrackSearchResults();
   for (let track of tracks.tracks.items) {
@@ -50,6 +48,10 @@ async function listTracks(query) {
     searchResult.removeAttribute('id');
     searchResult.removeAttribute('hidden');
     searchResult.classList.add('track-search-result');
+    searchResult.dataset.name = track.name;
+    searchResult.dataset.artist = track.artists[0].name;
+    searchResult.dataset.album = track.album.name;
+    searchResult.dataset.date = track.album.release_date;
     searchResult.dataset.uri = track.uri;
     searchResult.querySelector('#template-title').textContent = track.name;
     searchResult.querySelector('#template-artist').textContent = track.artists[0].name;
@@ -61,10 +63,17 @@ async function listTracks(query) {
   }
 }
 
-
 function onTrackSearchResultClick(searchResult){
-  // Get track URI from button and load it
+  // Extract track information from dataset
+  const name = searchResult.dataset.name;
+  const artist = searchResult.dataset.artist;
+  const album = searchResult.dataset.album;
+  const date = searchResult.dataset.date;
   const trackUri = searchResult.dataset.uri;
+  // Show the spinner
+  showLoadingSpinnerLyrics();
+  // Fetch lyrics from Genius, providing all the info it may need to find a match
+  geniusGetLyrics(name, artist, album, date, trackUri);
   // Load track into player
   playerLoadURI(trackUri);
   // Populate track information
@@ -75,11 +84,26 @@ function onTrackSearchResultClick(searchResult){
   showMainPage();
 }
 
+function showLoadingSpinnerLyrics(){
+  const spinner = document.querySelector('#spinner').cloneNode(true);
+  spinner.removeAttribute('id');
+  spinner.removeAttribute('hidden');
+  document.querySelector('#lyrics').appendChild(spinner);
+}
+
+function showLoadingSpinnerTrackSearch(){
+  const spinner = document.querySelector('#spinner').cloneNode(true);
+  spinner.removeAttribute('id');
+  spinner.removeAttribute('hidden');
+  document.querySelector('#search-results').appendChild(spinner);
+}
+
 function clearTrackSearchResults(){
-  const trackSearchResults = document.querySelectorAll('.track-search-result');
-  for (let trackSearchResult of trackSearchResults) {
-    trackSearchResult.remove();
-  }
+  document.querySelector('#search-results').innerHTML = '';
+}
+
+function clearLyrics(){
+  document.querySelector('#lyrics').innerHTML = '';
 }
 
 async function populateTrackInformation(trackUri){
@@ -108,26 +132,44 @@ function msToTime(duration) {
 }
 
 function showMainPage() {
-  document.querySelector('#linking-page').setAttribute('hidden', '');
-  document.querySelector('#landing-page').setAttribute('hidden', '');
+  hideAllPages();
   document.querySelector('#main-page').removeAttribute('hidden');
+  scrollToTop();
 }
 
 function showLandingPage() {
-  document.querySelector('#linking-page').setAttribute('hidden', '');
-  document.querySelector('#main-page').setAttribute('hidden', '');
+  hideAllPages();
   document.querySelector('#landing-page').removeAttribute('hidden');
+  scrollToTop();
 }
 
 function showLinkingPage() {
+  hideAllPages();
+  document.querySelector('#linking-page').removeAttribute('hidden');
+  scrollToTop();
+}
+
+function hideAllPages(){
   document.querySelector('#main-page').setAttribute('hidden', '');
   document.querySelector('#landing-page').setAttribute('hidden', '');
-  document.querySelector('#linking-page').removeAttribute('hidden');
+  document.querySelector('#linking-page').setAttribute('hidden', '');
+}
+
+function scrollToTop(){
+  // wait for page to redraw then scroll to top
+  window.requestAnimationFrame(() => {
+    window.scrollTo(0, 0);
+  });
 }
 
 // Event listeners
 document.querySelector('#search-bar').addEventListener('submit', function (event) {
     event.preventDefault();
     const query = document.querySelector('#search-bar input').value;
-    listTracks(query);
+    searchTracks(query);
   });
+
+  document.querySelector('#title-link').addEventListener('click', () => {
+    showLandingPage();
+    playerRespawn();
+  })

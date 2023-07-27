@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css" />
     <script defer src="./js/spotify.js"></script>
     <script defer src="./js/genius.js"></script>
+    <script defer src="./js/player.js"></script>
     <script defer src="./js/app.js"></script>
     <title>Lyrynx</title>
 </head>
@@ -62,38 +63,17 @@
                 <button class="rounded-full px-10 bg-green-500 hover:bg-green-600 active:bg-green-700"><img src="./images/spotify-logo.png" alt="spotify logo"><p>Link Spotify Account Here</p></button>
             </div>
             <div id="search-results" class="">
-                <div hidden id="search-results-template" class="template-styling
-                    flex
-                    border-solid
-                    my-4  
-                    border-2
-                    p-4 
-                    justify-start
-                    rounded
-                    text-left
-                    hover:bg-stone-700
-                    active:bg-stone-800
-                    max-w-lg">
-                    <section class="box-content h-16 w-16 p-0 bg-green-500">
-                        <img id="template-art" class="w-full h-full p-0">
-                    </section>
-                    <section class="ml-5">
-                        <p id="template-title" class="font-bold">Title</p>
-                        <p id="template-artist" class="italic text-stone-400">Artist</p>
-                    </section>
-                </div>
             </div>
-            
-
         </section>
     </div>
     <!-- Main page -->
     <div hidden id="main-page">
         <nav class="flex justify-around py-5">
-            <h1 class="text-5xl
+            <h1 id="title-link" class="text-5xl
             italic 
             tracking-wide 
             font-bold 
+            cursor-pointer 
             text-transparent bg-clip-text bg-gradient-to-r from-pink-500 from-30% to-orange-500 to-70% p-3">Lyrynx
             </h1>
             <input type="text"
@@ -121,9 +101,32 @@
         <div class="lyric-box mt-20 ">
             <section id="lyrics" class="relative inline text-left text-slate-300">Lyrics goes here.</section>
         </div>
-        <div id="player-container"><div id="spotify-player"></div>
+        <div id="player-container"></div>
     </div>
-    <script src="js/player.js"></script>
+    <!-- Template Elements -->
+    <div hidden id="search-results-template" class="template-styling
+            flex
+            border-solid
+            my-4  
+            border-2
+            p-4 
+            justify-start
+            rounded
+            text-left
+            hover:bg-stone-700
+            active:bg-stone-800
+            max-w-lg">
+        <section class="box-content h-16 w-16 p-0 bg-green-500">
+            <img id="template-art" class="w-full h-full p-0">
+        </section>
+        <section class="ml-5">
+            <p id="template-title" class="font-bold">Title</p>
+            <p id="template-artist" class="italic text-stone-400">Artist</p>
+        </section>
+    </div>
+    <div hidden id="spinner" class="h-14 h-14 p-4 flex justify-around">
+        <span class="loader"></span>
+    </div>
 </body>
 
 </html>
