@@ -5,6 +5,7 @@ var geniusAPIKey;
 const CLEANREGEX = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
 const TIER2 = true;
 const MAXFALLBACKS = 4;
+const DEBUG = true;
 
 // Load API key first
 fetch('secrets.json')
@@ -15,27 +16,13 @@ fetch('secrets.json')
   }
 );
 
-// High confidence filters:
-// (T1) Song name and artist name match
-// (T2) Spotify URI matches
+function debugLog(){
+  if(DEBUG){
+    // Debug log with black background and green text
+    console.log('%cDEBUG', 'background: black; color: lime; padding: 0px 3px', ...arguments);
 
-// Useful data included in the Search API response
-
-// artist_names: "King Gizzard & The Lizard Wizard"
-// full_title: "Robot Stop by King Gizzard & The Lizard Wizard"
-// lyrics_state: "complete"
-// primary_artist: {name: "King Gizzard & The Lizard Wizard"}
-// release_date_components: {day: 29, month: 4, year: 2016}
-// release_date_for_display: "April 29, 2016" 
-// release_date_with_abbreviated_month_for_display: "Apr. 29, 2016"
-// stats: {hot: false, pageviews: 108390, unreviewed_annotations: 19}
-// title: "Robot Stop"
-// title_with_featured: "Robot Stop"
-
-
-// Matching order:
-// Tier 1 High, Tier 1 Low, Tier 2
-
+  }
+}
 
 // Return the lyrics for a specific track
 function geniusGetLyrics(name, artist, album, date, trackUri){
@@ -56,10 +43,10 @@ async function matchSong(name, artist, album, date, trackUri){
   const queryString3 = artist + ' ' + name;
   const queryString4 = name;
 
-  // console.log(queryString1);
-  // console.log(queryString2);
-  // console.log(queryString3);
-  // console.log(queryString4);
+  debugLog(queryString1);
+  debugLog(queryString2);
+  debugLog(queryString3);
+  debugLog(queryString4);
 
   // TODO: Implement MAXFALLBACKS
 
@@ -81,21 +68,39 @@ async function matchSong(name, artist, album, date, trackUri){
     }
   }
 
-  document.querySelector("#lyrics").innerHTML = "No lyrics found";
-  
+  // TODO: Manual search fallback
+  document.querySelector("#lyrics").innerHTML = "Could not match lyrics. Please select from the list";
+
+  // Use song list from cleaned name search
+  for(let geniusSong of songListList[1]){
+    debugLog(geniusSong);
+    const searchResult = document.querySelector('#search-results-template').cloneNode(true);
+    searchResult.removeAttribute('id');
+    searchResult.removeAttribute('hidden');
+    searchResult.querySelector('#template-title').innerHTML = geniusSong.title;
+    searchResult.querySelector('#template-artist').innerHTML = geniusSong.primary_artist.name;
+    searchResult.querySelector('#template-art').src = geniusSong.song_art_image_thumbnail_url;
+    searchResult.addEventListener('click', function(){
+      // clear lyrics field
+      document.querySelector("#lyrics").innerHTML = "";
+      showLoadingSpinnerLyrics();
+      getSong(geniusSong.id.toString());
+    });
+    document.querySelector("#lyrics").appendChild(searchResult);
+  }
 }
 
 // Attempt to match using only data from the initial search
 function tier1Match(songList, spotifyTitle, spotifyArtist){
   let matches = [];
-  // console.log(songList);
+  debugLog(songList);
   for(let geniusSong of songList){
     // Clean up strings
     const geniusTitle = geniusSong.title.toLowerCase();
     const geniusTitleClean = geniusSong.title.replace(CLEANREGEX, '').trim().toLowerCase();
     const geniusArtist = geniusSong.primary_artist.name.toLowerCase();
 
-    // console.log(geniusTitleClean + ' <==> ' + spotifyTitle);
+    debugLog(geniusTitleClean + ' <==> ' + spotifyTitle);
 
     // Match Title AND Artist
     if((geniusTitle === spotifyTitle || geniusTitleClean === spotifyTitle) && geniusArtist === spotifyArtist){
@@ -123,7 +128,7 @@ function tier1Match(songList, spotifyTitle, spotifyArtist){
 }
 
 function tier2Match(songList, spotifyTitle, spotifyArtist){
-  // console.log('@tier2Match');
+  debugLog('@tier2Match');
   // Just return first result until function is implemented
   return songList[0];
 }
@@ -141,23 +146,6 @@ function geniusSearch(geniusToSearch) {
   .then(data => {
     // return map of data.response.hits[x].result
     return data.response.hits.map(hit => hit.result);
-    
-    console.log(data);
-    var song = data.response.hits[0].result
-    var songId = song.id.toString();
-    getSong(songId);
-    // var title = song.full_title
-    // var lCaseTitle = title.toLowerCase()
-    // var splitlCaseTitle = lCaseTitle.split(' by')[0]
-    // var lCasetoSearch = geniusToSearch.toLowerCase()
-    // // console.log(splitlCaseTitle);
-
-    // if (splitlCaseTitle === lCasetoSearch) {
-    //   getSong(songId)
-    //   // console.log(songId)
-    // } else {
-    //   console.log("not same")
-    // }
   })
 
   return songList;
@@ -165,9 +153,9 @@ function geniusSearch(geniusToSearch) {
 
 
 function getSong(songId) {
-  // console.log(id)
+  // debugLog(id)
   const requestUrl = 'https://api.genius.com/songs/'+ songId + '?access_token=' + geniusAPIKey;
-  // console.log(requestUrl)
+  // debugLog(requestUrl)
   const lyric = fetch(requestUrl, {
     method: 'GET',
     })
@@ -176,7 +164,7 @@ function getSong(songId) {
     })
 
     .then(data => {
-      // console.log(data);
+      // debugLog(data);
       var song = data.response.song.embed_content;
       let parser = new DOMParser();
       let doc = parser.parseFromString(song, "text/html");
