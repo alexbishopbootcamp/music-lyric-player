@@ -112,7 +112,7 @@ async function populateTrackInformation(trackUri){
   // Populate track information
   document.querySelector('#album-art img').src = track.album.images[0].url;
   document.querySelector('#track-title').textContent = track.name;
-  //document.querySelector('#artist-name').textContent = track.artists[0].name;
+  document.querySelector('#artist-name').textContent = track.artists[0].name;
   document.querySelector('#album-name').textContent = track.album.name;
   document.querySelector('#release-year').textContent = track.album.release_date.slice(0, 4);
   document.querySelector('#song-length').textContent = msToTime(track.duration_ms);
