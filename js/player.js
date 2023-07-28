@@ -21,7 +21,7 @@ function playerRespawn(){
 
 function playerSpawn(){
   if(!spotifyIFrameAPI){
-    console.error("Spotify IFrameAPI not loaded");
+    // Silenty return
     return;
   }
 

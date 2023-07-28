@@ -134,18 +134,24 @@ function msToTime(duration) {
 function showMainPage() {
   hideAllPages();
   document.querySelector('#main-page').removeAttribute('hidden');
+  // Move search form to main page
+  document.querySelector('#main-page-search').appendChild(document.querySelector('#search-bar'));
   scrollToTop();
 }
 
 function showLandingPage() {
   hideAllPages();
   document.querySelector('#landing-page').removeAttribute('hidden');
+  // Move search form to landing page
+  document.querySelector('#landing-page-search').appendChild(document.querySelector('#search-bar'));
+  playerRespawn();
   scrollToTop();
 }
 
 function showLinkingPage() {
   hideAllPages();
   document.querySelector('#linking-page').removeAttribute('hidden');
+  playerRespawn();
   scrollToTop();
 }
 
@@ -166,10 +172,11 @@ function scrollToTop(){
 document.querySelector('#search-bar').addEventListener('submit', function (event) {
     event.preventDefault();
     const query = document.querySelector('#search-bar input').value;
+    // Always show landing page when searching
+    showLandingPage();
     searchTracks(query);
   });
 
-  document.querySelector('#title-link').addEventListener('click', () => {
-    showLandingPage();
-    playerRespawn();
-  })
+document.querySelector('#title-link').addEventListener('click', () => {
+  showLandingPage();
+})
