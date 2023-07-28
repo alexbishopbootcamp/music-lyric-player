@@ -1,5 +1,6 @@
 // Consts and globals
 const spotify_clientId = '22f3db4cf7b34903bf1542c51b5ed79c'; // Client ID for our Spotify app
+const documentOrigin = document.location.origin + document.location.pathname;
 
 // Code adapted from Spotify's documentation
 // https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
@@ -31,7 +32,7 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 function spotifyOAuth() {
-  const redirectUri = document.location.origin;
+  const redirectUri = documentOrigin;
   let codeVerifier = generateRandomString(128);
 
   generateCodeChallenge(codeVerifier).then((codeChallenge) => {
@@ -63,9 +64,9 @@ async function spotifyCatchOAuthReturn() {
     const state = urlParams.get('state');
     const error = urlParams.get('error');
 
-    // Remove URL params from view
-    window.history.replaceState({}, document.title, '/');
-
+    // Remove URL params from address bar
+    history.replaceState({}, document.title, documentOrigin);
+    
     // Bail if error encountered
     if (error) {
       reject(error);
@@ -75,7 +76,7 @@ async function spotifyCatchOAuthReturn() {
       // Get code verifier from local storage
       let codeVerifier = localStorage.getItem('spotify_code_verifier');
 
-      const redirectUri = document.location.origin;
+      const redirectUri = documentOrigin;
 
       let body = new URLSearchParams({
         grant_type: 'authorization_code',
