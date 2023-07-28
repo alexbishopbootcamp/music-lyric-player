@@ -28,7 +28,8 @@
                 py-5">Lyrynx</h1>
             </div>
             <div id="mt-8" class="text-lg mt-12 text-base">
-                <p>Log in to your <span class="italic font-bold">Spotify</span> account to play your favourite songs!</p>
+                <p>Log in to your <span class="italic font-bold">Spotify</span> account to play your favourite songs!
+                </p>
             </div>
             <div class="mt-12 flex justify-center">
                 <button id="spotify-btn"
@@ -53,24 +54,21 @@
                 <p>Welcome to Lyrynx! Start listening and singing to your favourite songs <br>by entering the track name
                     in the search bar below!</p>
             </div>
-            <div id="search-container" class="flex w-1/6 m-auto justify-center">
+            <div id="search-container" class="flex w-1/5 m-auto justify-center">
                 <form id="search-bar" class="flex w-full">
-                    <input type="text" class="flex-auto w-5/6 rounded-full py-2.5 indent-5 text-black focus:outline-gray-300"
-                    placeholder="Search track here...">
+                    <input type="text"
+                        class="flex-auto w-5/6 rounded-full py-2.5 indent-5 text-black focus:outline-gray-300"
+                        placeholder="Search track here...">
                     <button type="submit"
-                    class="w-1/6 rounded-full bg-green-600 py-2.5 px-6 hover:bg-green-700 transition ease-in-out delay-10">Search</button>
+                        class="rounded-full bg-green-600 py-2.5 px-6 hover:bg-green-700 transition ease-in-out delay-10">Search</button>
                 </form>
             </div>
-            <div hidden id="spotify-btn" class="mt-12">
-                <button class="rounded-full px-10 bg-green-500 hover:bg-green-600 active:bg-green-700"><img src="./images/spotify-logo.png" alt="spotify logo"><p>Link Spotify Account Here</p></button>
-            </div>
-            <div id="search-results" class="">
-            </div>
+            <div id="search-results" class=""></div>
         </section>
     </div>
     <!-- Main page -->
     <div hidden id="main-page">
-        <nav class="flex justify-around py-5">
+        <nav class="flex justify-around items-center py-5">
             <h1 id="title-link" class="text-5xl
             italic 
             tracking-wide 
@@ -78,14 +76,14 @@
             cursor-pointer 
             text-transparent bg-clip-text bg-gradient-to-r from-pink-500 from-30% to-orange-500 to-70% p-3">Lyrynx
             </h1>
-            <div id="main-search" class="h-8 w-1/6 py-2.5 bg-yellow-600"></div>
+            <div id="main-search" class="bg-yellow-600"></div>
         </nav>
 
         <div class="artist-banner flex justify-center pb-5 mt-5 bg-gradient-to-t from-slate-600">
 
 
             <section id="album-art" class="box-content h-52 w-52 pl-5">
-                <img class="w-full h-full p-0"src=""/ alt="album art">
+                <img class="w-full h-full p-0" src="" alt="album art">
             </section>
 
             <section class="track-info ml-10 leading-10">
@@ -97,7 +95,8 @@
             </section>
         </div>
         <div class="lyric-box flex justify-center mt-12 ">
-            <section id="lyrics" class="relative inline text-left text-slate-300 bg-zinc-800 p-4">Lyrics goes here.</section>
+            <section id="lyrics" class="relative inline text-left text-slate-300 bg-zinc-800 p-4">Lyrics goes here.
+            </section>
         </div>
         <div id="player-container"></div>
     </div>
