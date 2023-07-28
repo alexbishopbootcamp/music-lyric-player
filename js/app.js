@@ -173,3 +173,17 @@ document.querySelector('#search-bar').addEventListener('submit', function (event
     showLandingPage();
     playerRespawn();
   })
+
+function swap(){
+  const search = document.querySelector('#search-bar');
+  // Check if search's parent element is a nav element
+  if(search.parentElement.id === 'main-search'){
+    // Move search bar to landing page and show landing page
+    document.querySelector('#search-container').appendChild(search);
+    showLandingPage();
+  } else {
+    // Move search bar to nav and show main page
+    document.querySelector('#main-search').appendChild(search);
+    showMainPage();
+  }
+}
