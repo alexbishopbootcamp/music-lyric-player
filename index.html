@@ -32,8 +32,8 @@
             </div>
             <div class="mt-12 flex justify-center">
                 <button id="spotify-btn"
-                    class="flex items-center rounded-full px-10 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 transition ease-in-out delay-10 ">
-                    <img src="./images/spotify-logo.png" class="w-10 float-left" alt="spotify logo">
+                    class="flex items-center rounded-full px-10 py-3 bg-green-500 hover:bg-green-600 active:bg-green-700 transition ease-in-out delay-10 ">
+                    <img src="./images/spotify-logo.png" class="w-10 float-left p-0" alt="spotify logo">
                     <p class="float-right ml-5 text-lg">Link Spotify Account Here</p>
                 </button>
             </div>
@@ -49,16 +49,18 @@
                 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 from-35% to-orange-500 to-65% 
                 py-5">Lyrynx</h1>
             </div>
-            <div id="mt-8" class="text-lg mt-12 text-base">
+            <div id="mt-8" class="text-lg mt-12 mb-6 text-base">
                 <p>Welcome to Lyrynx! Start listening and singing to your favourite songs <br>by entering the track name
                     in the search bar below!</p>
             </div>
-            <form id="search-bar" class="mt-6">
-                <input type="text" class="rounded-full w-1/3 py-2.5 indent-5 text-black focus:outline-gray-300"
+            <div id="search-container" class="flex justify-center">
+                <form id="search-bar" class="flex w-1/4">
+                    <input type="text" class="flex-auto w-5/6 rounded-full py-2.5 indent-5 text-black focus:outline-gray-300"
                     placeholder="Search track here...">
-                <button type="submit"
-                    class="rounded-full bg-green-600 py-2.5 px-6 hover:bg-green-700 transition ease-in-out delay-10">Search</button>
-            </form>
+                    <button type="submit"
+                    class="w-1/6 rounded-full bg-green-600 py-2.5 px-6 hover:bg-green-700 transition ease-in-out delay-10">Search</button>
+                </form>
+            </div>
             <div hidden id="spotify-btn" class="mt-12">
                 <button class="rounded-full px-10 bg-green-500 hover:bg-green-600 active:bg-green-700"><img src="./images/spotify-logo.png" alt="spotify logo"><p>Link Spotify Account Here</p></button>
             </div>
@@ -85,7 +87,7 @@
 
 
             <section id="album-art" class="box-content h-52 w-52 pl-5">
-                <img class="w-full h-full p-0"src=""/ alt="alcum art">
+                <img class="w-full h-full p-0"src=""/ alt="album art">
             </section>
 
             <section class="track-info ml-10 leading-10">
