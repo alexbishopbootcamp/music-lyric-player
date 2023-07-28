@@ -26,6 +26,14 @@ img {
   bottom: 0px;
 }
 
+#landing-page-search {
+  width: 600px;
+}
+
+#main-page-search {
+  width: 400px;
+}
+
 
 #player-container {
   background-color: #282828;
