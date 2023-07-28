@@ -3,7 +3,6 @@
 // Globals and constants
 var geniusAPIKey;
 const CLEANREGEX = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
-const TIER2 = true;
 const MAXFALLBACKS = 4;
 const DEBUG = true;
 
@@ -25,12 +24,11 @@ function debugLog(){
 }
 
 // Return the lyrics for a specific track
-function geniusGetLyrics(name, artist, album, date, trackUri){
-  // getSongDetails(artist + ' ' + name);
-  matchSong(name, artist, album, date, trackUri);
+function geniusGetLyrics(name, artist){
+  matchSong(name, artist);
 }
 
-async function matchSong(name, artist, album, date, trackUri){
+async function matchSong(name, artist){
   // Always .toLowerCase() before comparing strings
   name = name.toLowerCase();
   artist = artist.toLowerCase();
@@ -109,7 +107,6 @@ function tier1Match(songList, spotifyTitle, spotifyArtist){
 
     // Match Unique Title (inside loop)
     else if(geniusTitle === spotifyTitle || geniusTitleClean === spotifyTitle){
-      
       matches.push(geniusSong);
     }
   }
@@ -118,23 +115,18 @@ function tier1Match(songList, spotifyTitle, spotifyArtist){
   if(matches.length === 1){
     return matches[0];
     
-  // Proceed to tier 2 matching
+  // Return first match if there are multiple
   } else if(matches.length > 1 && TIER2){
-    return tier2Match(matches, spotifyTitle, spotifyArtist);
+    return songList[0];
   }
 
   // Fallback
   return false;
 }
 
-function tier2Match(songList, spotifyTitle, spotifyArtist){
-  debugLog('@tier2Match');
-  // Just return first result until function is implemented
-  return songList[0];
-}
-
-function geniusSearch(geniusToSearch) {
-  const urlQuery = encodeURIComponent(geniusToSearch);
+// Return a list of songs from Genius that match the search query
+function geniusSearch(query) {
+  const urlQuery = encodeURIComponent(query);
   const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&access_token=' + geniusAPIKey;
   
   const songList = fetch(requestUrl, {
