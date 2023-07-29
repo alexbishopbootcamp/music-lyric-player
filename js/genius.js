@@ -1,11 +1,7 @@
-// TODO: apply hidden to genius analytics iframe as it sometimes 404s and becomes visible
-
 // Globals and constants
 var geniusAPIKey;
 const CLEANREGEX = /(\(.+\)|-.+|,.+|feat\..+|\/.+)/g;
-const TIER2 = true;
-const MAXFALLBACKS = 4;
-const DEBUG = true;
+const DEBUG = false;
 
 // Load API key first
 fetch('secrets.json')
@@ -16,21 +12,24 @@ fetch('secrets.json')
   }
 );
 
+// Debug logging function to make it easier to turn on and off
 function debugLog(){
   if(DEBUG){
-    // Debug log with black background and green text
     console.log('%cDEBUG', 'background: black; color: lime; padding: 0px 3px', ...arguments);
-
   }
 }
 
-// Return the lyrics for a specific track
-function geniusGetLyrics(name, artist, album, date, trackUri){
-  // getSongDetails(artist + ' ' + name);
-  matchSong(name, artist, album, date, trackUri);
+// Return the lyrics for a specific track in HTML form
+async function geniusGetLyrics(name, artist){
+  const lyrics = await matchSong(name, artist);
+  // Place lyrics on the page if we get any
+  if(lyrics){
+    document.querySelector("#lyrics").innerHTML = lyrics;
+  }
 }
 
-async function matchSong(name, artist, album, date, trackUri){
+
+async function matchSong(name, artist){
   // Always .toLowerCase() before comparing strings
   name = name.toLowerCase();
   artist = artist.toLowerCase();
@@ -48,46 +47,55 @@ async function matchSong(name, artist, album, date, trackUri){
   debugLog(queryString3);
   debugLog(queryString4);
 
-  // TODO: Implement MAXFALLBACKS
-
-  // pre-fetch all fallback searches
+  // pre-fetch all fallback searches.
+  // This gives us very good coverage in the case that Spotify or Genius is
+  // using the wrong name for a song, or is otherwise formatted differently.
+  // Incremental fallbacks was never implemented in order to speed up the
+  // lyric fetching process.
   const songList1 = geniusSearch(queryString1);
   const songList2 = geniusSearch(queryString2);
   const songList3 = geniusSearch(queryString3);
   const songList4 = geniusSearch(queryString4);
 
-  // Join promises
+  // Join promises (ie. wait for the 4 web fetches to complete).
+  // This will result in a list of lists of songs.
   const songListList = await Promise.all([songList1, songList2, songList3, songList4]);
   
-  // const matchedLyrics = tier1Match(songList, name, artist);
+  // Attempt to find a clean match for each song list
   for(let songList of songListList){
-    const matchedLyrics = tier1Match(songList, cleanName, artist);
-    if(matchedLyrics){
-      getSong(matchedLyrics.id.toString());
-      return;
+    const matchedSong = tier1Match(songList, cleanName, artist);
+    if(matchedSong){
+      return geniusIDToLyrics(matchedSong.id.toString());
     }
   }
 
-  // TODO: Manual search fallback
-  document.querySelector("#lyrics").innerHTML = "Could not match lyrics. Please select from the list";
+  // If execution reaches this point, no matches were found
+  debugLog('No song matches found.')
+  document.querySelector("#lyrics").innerHTML = '<p>Could not match lyrics. Please select from the list</p>';
 
-  // Use song list from cleaned name search
+  // Use song list from cleaned name search. This consistently returns the most relevant results.
   for(let geniusSong of songListList[1]){
     debugLog(geniusSong);
+    // Clone our search result template and use it to display lyric suggestions
     const searchResult = document.querySelector('#search-results-template').cloneNode(true);
     searchResult.removeAttribute('id');
     searchResult.removeAttribute('hidden');
-    searchResult.querySelector('#template-title').innerHTML = geniusSong.title;
-    searchResult.querySelector('#template-artist').innerHTML = geniusSong.primary_artist.name;
+    searchResult.querySelector('#template-title').textContent = geniusSong.title;
+    searchResult.querySelector('#template-artist').textContent = geniusSong.primary_artist.name;
     searchResult.querySelector('#template-art').src = geniusSong.song_art_image_thumbnail_url;
-    searchResult.addEventListener('click', function(){
-      // clear lyrics field
+    searchResult.dataset.geniusId = geniusSong.id.toString();
+    searchResult.addEventListener('click', async function(){
+      // On click, fetch the lyrics for the selected song and display them
       document.querySelector("#lyrics").innerHTML = "";
       showLoadingSpinnerLyrics();
-      getSong(geniusSong.id.toString());
+      const lyrics = await geniusIDToLyrics(this.dataset.geniusId);
+      document.querySelector("#lyrics").innerHTML = lyrics;
     });
+    // Need to append child here in order to preserve the event liseners we attached
     document.querySelector("#lyrics").appendChild(searchResult);
   }
+
+  return;
 }
 
 // Attempt to match using only data from the initial search
@@ -109,7 +117,6 @@ function tier1Match(songList, spotifyTitle, spotifyArtist){
 
     // Match Unique Title (inside loop)
     else if(geniusTitle === spotifyTitle || geniusTitleClean === spotifyTitle){
-      
       matches.push(geniusSong);
     }
   }
@@ -118,25 +125,22 @@ function tier1Match(songList, spotifyTitle, spotifyArtist){
   if(matches.length === 1){
     return matches[0];
     
-  // Proceed to tier 2 matching
-  } else if(matches.length > 1 && TIER2){
-    return tier2Match(matches, spotifyTitle, spotifyArtist);
+  // Return first match if there are multiple
+  } else if(matches.length > 1){
+    return songList[0];
   }
 
   // Fallback
   return false;
 }
 
-function tier2Match(songList, spotifyTitle, spotifyArtist){
-  debugLog('@tier2Match');
-  // Just return first result until function is implemented
-  return songList[0];
-}
-
-function geniusSearch(geniusToSearch) {
-  const urlQuery = encodeURIComponent(geniusToSearch);
+// Return a list of songs from Genius that match the search query
+function geniusSearch(query) {
+  // Encode URL parameter
+  const urlQuery = encodeURIComponent(query);
   const requestUrl = 'https://api.genius.com/search?q=' + urlQuery + '&access_token=' + geniusAPIKey;
   
+  // Fetch song list
   const songList = fetch(requestUrl, {
     method: 'GET',
   })
@@ -151,63 +155,82 @@ function geniusSearch(geniusToSearch) {
   return songList;
 }
 
+// Returns the HTML lyrics for a song given its Genius ID
+async function geniusIDToLyrics(songId){
+  
+  // The first API call of this function as been omitted due to an optimization
+  // where we can just build the URL manually. This is because the embed.js URL
+  // is deterministic based on the song ID.
 
-function getSong(songId) {
-  // debugLog(id)
-  const requestUrl = 'https://api.genius.com/songs/'+ songId + '?access_token=' + geniusAPIKey;
-  // debugLog(requestUrl)
-  const lyric = fetch(requestUrl, {
-    method: 'GET',
-    })
-    .then(response => {
-      return response.json();
-    })
+  // const requestUrl = 'https://api.genius.com/songs/'+ songId + '?access_token=' + geniusAPIKey;
+  
+  // // Get song data
+  // const song = await fetch(requestUrl, {
+  //   method: 'GET',
+  //   })
+  //   .then(response => {
+  //     return response.json();
+  //   })
+  //   .then(data => {
+  //     return data.response.song;
+  //   })
+  //   .catch(error => {
+  //       console.error('Error:', error);
+  //   });
 
-    .then(data => {
-      // debugLog(data);
-      var song = data.response.song.embed_content;
-      let parser = new DOMParser();
-      let doc = parser.parseFromString(song, "text/html");
-      let scriptTag = doc.body.childNodes[2];
-      var src = scriptTag.src
-      const requestUrl = src;
-      getLyrics(requestUrl)
-      return song;
-    })
-    .catch(error => {
+    const parser = new DOMParser();
+
+  //   // Extract the embed.js URL from the song data
+  //   const embedHTML = song.embed_content;
+  //   const embed = parser.parseFromString(embedHTML, 'text/html');
+  //   const embedJsURL = embed.querySelector('script').src;
+
+    // Skip the previous request and just build the URL manually using the deterministic embed URL
+    const embedJsURL = `https://genius.com/songs/${songId}/embed.js`
+
+
+    // Get the embed.js file
+    const embedJs = await fetch(embedJsURL, {
+        method: 'GET',
+      })
+      .then(response => {
+        debugLog(response);
+        return response.text();
+      })
+      .catch(error => {
         console.error('Error:', error);
-    });
+      });
+  
+    // Attempting to manually parse the JSON string proved too difficult under
+    // the (multiple) layers of escaping (I counted up to 7 or 8 backslashes
+    // in a row in some places!)
+    // Instead, we will just cut out the JSON string including the JSON.parse
+    // and eval it in the context of this script
+    // Extract the JSON string, still encased in JSON.parse, from the embed.js file
+    const regex = /(JSON\.parse\('.+'\))/gm;
+    const lyrics = eval(regex.exec(embedJs)[0]);
 
-    return lyric;
-}
+    // Parse HTML and only return the body of the embed
+    const doc = parser.parseFromString(lyrics, 'text/html');
+    const docBody = doc.querySelector('.rg_embed_body');
+    debugLog(docBody);
 
+    // Replace all child elements in doc with a copy of itself with only the textContent remainding
+    // This is to remove extra hrefs, attributes, etc. that we don't want
+    // We use a recursive function to traverse the DOM tree and make sure we get everything
+    function traverse(node){
+      for(let child of node.children){
+        if(child.children.length > 0){
+          traverse(child);
+        }
+        const newChild = document.createElement(child.tagName);
+        newChild.innerHTML = child.innerHTML;
+        debugLog(newChild);
+        node.replaceChild(newChild, child);
+      }
+    }
+    // Kick off the process
+    traverse(docBody);
 
-function getLyrics(requestUrl) {
-  const lyric = fetch(requestUrl, {
-    method: 'GET',
-    })
-    .then(response => {
-      return response.text();
-    })
-  async function displayLyrics() {
-    const lyricText = await lyric;
-    const regex = /(JSON\.parse.+)./g;
-    const match = regex.exec(lyricText)[0].split(0, -1);
-    const myScript = document.createElement('script');
-    myScript.innerHTML += 'document.querySelector("#lyrics").innerHTML = (';
-    myScript.innerHTML += match + ';lyricsInjected();';
-
-
-    document.body.appendChild(myScript);
-    // mainText.removeChild(mainText.children[1])
-  }
-  displayLyrics()
-}
-
-function lyricsInjected(){
-  debugLog('Script Injected');
-  // Cleanup left over elements from injection
-  document.querySelector('.rg_embed_header').remove();
-  document.querySelector('.rg_embed_footer').remove();
-  document.querySelector('.rg_embed_analytics').remove();
+    return docBody.innerHTML;
 }
