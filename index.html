@@ -50,12 +50,14 @@
             </div>
             <div id="landing-page-search" class="flex m-auto px-6 w-full sm:w-[600px] justify-center">
                 <form id="search-bar" class="flex w-full">
-                    <input type="text"
+                    <label for="search-input" class="sr-only">Search track here</label>
+                    <input id="search-input" type="text" role="searchbox" aria-label="Search track here"
                         class="flex-auto mr-2 w-5/6 rounded-full py-2.5 indent-5 text-black focus:outline-gray-300"
                         placeholder="Search track here...">
-                    <button type="submit"
-                        class="rounded-full bg-green-600 py-2.5 px-6 hover:bg-green-700 transition ease-in-out delay-10">Search</button>
+                    <button type="submit" aria-label="Search" 
+                        class="rounded-full bg-green-600 py-2.5 px-6 hover:bg-green-700 transition ease-in-out delay-10 focus:outline-gray-300">Search</button>
                 </form>
+                
             </div>
             <div id="search-results" class=""></div>
         </section>
