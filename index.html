@@ -14,47 +14,41 @@
     <title>Lyrynx</title>
 </head>
 
-<body>
-    <div class="box w-full text-center absolute top-1/4">
+<body class="bg-zinc-900 text-zinc-100">
+    <div class="w-full relative top-[25vh]">
 
         <!-- Initial, Linking Page Here -->
-        <section hidden id="linking-page">
-            <div>
-                <h1 class="text-9xl 
-                italic 
-                tracking-wide 
-                font-bold 
-                text-transparent bg-clip-text bg-gradient-to-r from-pink-500 from-35% to-orange-500 to-65% 
-                py-5">Lyrynx</h1>
+        <section hidden id="linking-page" class="flex flex-col">
+            <div class="text-center px-3">
+                <h1 class="text-7xl sm:text-9xl italic tracking-wide font-bold
+                text-transparent bg-clip-text bg-gradient-to-r from-pink-500
+                from-35% to-orange-500 to-65% py-5">Lyrynx</h1>
             </div>
-            <div id="mt-8" class="text-lg mt-12 text-base">
+            <div class="text-sm sm:text-lg mt-8 sm:mt-12 mb-6 sm:mb-8 text-base text-center px-6">
                 <p>Log in to your <span class="italic font-bold">Spotify</span> account to play your favourite songs!
                 </p>
             </div>
-            <div class="mt-12 flex justify-center">
+            <div class="flex justify-center">
                 <button id="spotify-btn"
-                    class="flex items-center rounded-full px-10 py-3 bg-green-500 hover:bg-green-600 active:bg-green-700 transition ease-in-out delay-10 ">
-                    <img src="./images/spotify-logo.png" class="w-10 float-left p-0" alt="spotify logo">
-                    <p class="float-right ml-5 text-lg">Link Spotify Account Here</p>
+                    class="flex items-center rounded-full px-8 sm:px-10 py-2 sm:py-3 bg-green-500 hover:bg-green-600 active:bg-green-700 transition ease-in-out delay-10 ">
+                    <img src="./images/spotify-logo.png" class="w-8 sm:w-10 float-left p-0" alt="spotify logo">
+                    <p class="float-right ml-5 text-sm sm:text-lg">Link Spotify Account Here</p>
                 </button>
             </div>
         </section>
 
         <!-- Landing Page Here -->
-        <section hidden id="landing-page">
-            <div>
-                <h1 class="text-9xl 
-                italic 
-                tracking-wide 
-                font-bold 
-                text-transparent bg-clip-text bg-gradient-to-r from-pink-500 from-35% to-orange-500 to-65% 
-                py-5">Lyrynx</h1>
+        <section hidden id="landing-page" class="flex flex-col">
+            <div class="text-center px-3">
+                <h1 class="text-7xl sm:text-9xl italic tracking-wide font-bold
+                text-transparent bg-clip-text bg-gradient-to-r from-pink-500
+                from-35% to-orange-500 to-65% py-5">Lyrynx</h1>
             </div>
-            <div id="mt-8" class="text-lg mt-12 mb-6 text-base">
+            <div class="text-sm sm:text-lg mt-8 sm:mt-12 mb-6 text-base text-center px-6">
                 <p>Welcome to Lyrynx! Start listening and singing to your favourite songs <br>by entering the track name
                     in the search bar below!</p>
             </div>
-            <div id="landing-page-search" class="flex m-auto justify-center">
+            <div id="landing-page-search" class="flex m-auto px-6 w-full sm:w-[600px] justify-center">
                 <form id="search-bar" class="flex w-full">
                     <input type="text"
                         class="flex-auto mr-2 w-5/6 rounded-full py-2.5 indent-5 text-black focus:outline-gray-300"
@@ -67,7 +61,7 @@
         </section>
     </div>
     <!-- Main page -->
-    <div hidden id="main-page">
+    <div hidden id="main-page" class="flex flex-col h-screen">
         <nav class="flex justify-around items-center py-5">
             <h1 id="title-link" class="text-5xl
             italic 
@@ -79,40 +73,29 @@
             <div class="mx-2" id="main-page-search"></div>
         </nav>
 
-        <div class="artist-banner flex justify-center pb-5 mt-5 bg-gradient-to-t from-slate-600">
-
-
-            <section id="album-art" class="box-content h-52 w-52 pl-0 md:pl-5">
-                <img class="w-full h-full p-0" src="" alt="album art">
+        <div class="artist-banner flex justify-center pb-5 mt-0 sm:mt-5 bg-gradient-to-t from-slate-600 flex-row items-center text-center">
+            <section id="album-art" class="box-content absolute brightness-50 sm:brightness-100 -z-10 sm:z-0 top-0 sm:z-0 sm:relative w-full sm:h-52 sm:w-52">
+                <img class="w-full h-full p-0" src="./images/placeholder-art.png" alt="album art">
             </section>
 
-            <section class="track-info ml-0 md:ml-10 md:leading-10 leading-7">
-                <h3 id="track-title" class="text-4xl font-bold md:mb-1 mb-3">Track Title</h3>
+            <section class="track-info ml-0 sm:ml-10 mt-0 sm:mt-3 leading-7 sm:leading-10">
+                <h3 id="track-title" class="text-4xl font-bold sm:mb-1 mb-3 text-3xl">Track Title</h3>
                 <p id="artist-name">Artist Name</p>
                 <p id="album-name">Album Name</p>
                 <p id="release-year">Release Year</p>
                 <p id="song-length">Song Duration</p>
             </section>
         </div>
-        <div class="lyric-box flex justify-center mt-12 ">
-            <section id="lyrics" class="relative inline text-left text-slate-300 bg-zinc-800 p-4">Lyrics goes here.
+        <div class="lyric-box flex-grow flex justify-center pb-20 sm:pb-32 mt-0 sm:mt-12 bg-zinc-900">
+            <section id="lyrics" class="relative inline text-center h-fit sm:text-left text-slate-300 p-8 mx-0 sm:mx-6 w-full sm:w-auto bg-zinc-900 sm:bg-zinc-800">Lyrics goes here.
             </section>
         </div>
         <div id="player-container"></div>
     </div>
     <!-- Template Elements -->
     <div hidden id="search-results-template" class="template-styling
-            flex
-            border-solid
-            my-4  
-            border-2
-            p-4 
-            justify-start
-            rounded
-            text-left
-            hover:bg-stone-700
-            active:bg-stone-800
-            max-w-lg">
+            flex border-solid my-4 border-2 p-4 justify-start rounded
+            text-left hover:bg-stone-700 active:bg-stone-800 max-w-lg">
         <section class="box-content h-16 w-16 p-0 bg-green-500">
             <img id="template-art" class="w-full h-full p-0">
         </section>
