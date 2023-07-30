@@ -8,6 +8,8 @@ This application was created so that people can listen to music with the lyrics 
 ## Usage
 Visit the live page [here](https://alexbishopbootcamp.github.io/music-lyric-player/)
 
+**Note that this app requires a spotify develpoer account to use. Once that account has been made link the client id at the top of the "spotify.js" document.
+
 To use this application, first you will have to link your spotify account by clicking the Spotify button on the first page you are presented with.
 
 ![spotify button image](./readme-images/spotify-button.PNG)
