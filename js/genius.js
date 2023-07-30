@@ -12,6 +12,23 @@ fetch('secrets.json')
   }
 );
 
+// Function to replace any curly quotes with their ascii equivalents
+function replaceCurlyQuotesWithAscii(inputString) {
+  const curlyQuotesRegex = /[\u2018\u2019\u201A\u201B\u201C\u201D\u201E\u201F]/g;
+  const asciiQuotesMap = {
+    '\u2018': "'", // Left single curly quote to apostrophe
+    '\u2019': "'", // Right single curly quote to apostrophe
+    '\u201A': "'", // Single low-9 quotation mark to apostrophe
+    '\u201B': "'", // Single high-reversed-9 quotation mark to apostrophe
+    '\u201C': '"', // Left double curly quote to double quotation mark
+    '\u201D': '"', // Right double curly quote to double quotation mark
+    '\u201E': '"', // Double low-9 quotation mark to double quotation mark
+    '\u201F': '"', // Double high-reversed-9 quotation mark to double quotation mark
+  };
+
+  return inputString.replace(curlyQuotesRegex, (match) => asciiQuotesMap[match]);
+}
+
 // Debug logging function to make it easier to turn on and off
 function debugLog(){
   if(DEBUG){
@@ -34,7 +51,9 @@ async function matchSong(name, artist){
   name = name.toLowerCase();
   artist = artist.toLowerCase();
   // Remove any extra info from the name
-  const cleanName = name.replace(CLEANREGEX, '').trim();
+  let cleanName = name.replace(CLEANREGEX, '').trim();
+  // Replace curly apostrophes with normal apostrophes
+  cleanName = replaceCurlyQuotesWithAscii(cleanName);
 
   // Query strings for each fallback
   const queryString1 = artist + ' ' + cleanName;
@@ -54,8 +73,13 @@ async function matchSong(name, artist){
   // lyric fetching process.
   const songList1 = geniusSearch(queryString1);
   const songList2 = geniusSearch(queryString2);
-  const songList3 = geniusSearch(queryString3);
-  const songList4 = geniusSearch(queryString4);
+  let songList3;
+  let songList4;
+  // Only search for the third and fourth fallbacks if they are different from the first two
+  if(name != cleanName){
+    songList3 = geniusSearch(queryString3);
+    songList4 = geniusSearch(queryString4);
+  }
 
   // Join promises (ie. wait for the 4 web fetches to complete).
   // This will result in a list of lists of songs.
@@ -63,14 +87,23 @@ async function matchSong(name, artist){
   
   // Attempt to find a clean match for each song list
   for(let songList of songListList){
-    const matchedSong = tier1Match(songList, cleanName, artist);
-    if(matchedSong){
-      return geniusIDToLyrics(matchedSong.id.toString());
+    if(songList){ // Check in case we got no results
+      const matchedSong = matchSpotifyToGenius(songList, cleanName, artist);
+      if(matchedSong){
+        return geniusIDToLyrics(matchedSong.id.toString());
+      }
     }
   }
 
   // If execution reaches this point, no matches were found
   debugLog('No song matches found.')
+
+  // Bail if we have no results
+  if(songListList[1].length === 0){
+    document.querySelector("#lyrics").innerHTML = '<p>Could not find any lyrics</p>';
+    return;
+  }
+  
   document.querySelector("#lyrics").innerHTML = '<p>Could not match lyrics. Please select from the list</p>';
 
   // Use song list from cleaned name search. This consistently returns the most relevant results.
@@ -99,13 +132,15 @@ async function matchSong(name, artist){
 }
 
 // Attempt to match using only data from the initial search
-function tier1Match(songList, spotifyTitle, spotifyArtist){
+function matchSpotifyToGenius(songList, spotifyTitle, spotifyArtist){
   let matches = [];
   debugLog(songList);
   for(let geniusSong of songList){
     // Clean up strings
     const geniusTitle = geniusSong.title.toLowerCase();
-    const geniusTitleClean = geniusSong.title.replace(CLEANREGEX, '').trim().toLowerCase();
+    let geniusTitleClean = geniusSong.title.replace(CLEANREGEX, '').trim().toLowerCase();
+    // Also replace any curly quotes with ascii quotes here
+    geniusTitleClean = replaceCurlyQuotesWithAscii(geniusTitleClean);
     const geniusArtist = geniusSong.primary_artist.name.toLowerCase();
 
     debugLog(geniusTitleClean + ' <==> ' + spotifyTitle);
